@@ -1,0 +1,7 @@
+# VORTEX config: offline mock (zero deps, default)
+llm:
+  mode: mock
+
+engine:
+  max_spirals: 5
+  verbose: false

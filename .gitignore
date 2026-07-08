@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venx/
+
+# Data (generated)
+data/
+results/
+
+# Configs with secrets
+**/configs/gpu.yaml
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Index
+*.faiss
+*.pkl
+
+# Environment
+.env
+*.env
+
+# Browser session artifacts
+.playwright-mcp/

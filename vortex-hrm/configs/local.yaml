@@ -1,0 +1,14 @@
+# VORTEX config: laptop track (Ollama + tiny model on CPU)
+llm:
+  mode: ollama
+  model: qwen2.5:0.5b
+  base_url: http://localhost:11434/v1
+  temperature: 0.0
+  max_tokens: 2048
+
+engine:
+  max_spirals: 10
+  confidence_threshold: 0.85
+  entropy_stall_limit: 3
+  context_budget: 4096
+  verbose: true
