@@ -1,0 +1,5 @@
+# Lightweight dependencies for Phase 2 (Ollama, CPU).
+# Install with:  pip install -r requirements-local.txt
+numpy>=1.24.0
+pyyaml>=6.0
+requests>=2.31.0

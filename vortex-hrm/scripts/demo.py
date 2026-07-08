@@ -6,7 +6,9 @@ Usage:  python scripts/demo.py
 """
 
 import sys
-sys.path.insert(0, "src")
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 import numpy as np
 from unittest.mock import patch

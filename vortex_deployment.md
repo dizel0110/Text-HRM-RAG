@@ -29,22 +29,33 @@ python scripts/demo.py     # synthetic corpus, offline mock LLM
 | CPU | i5-1135G7 (4 cores) |
 | RAM | 8 GB |
 | GPU | Intel Iris Xe (1 GB, no CUDA) |
-| Free disk | ~2 GB (after reboot) |
+| Free disk | C: ~7 GB, D: ~38 GB |
 | Verdict | **Средний ультрабук 2021.** Офис, код, маленькие ML-модели — норм. Для 7B+ моделей не предназначен. VORTEX как раз про работу на таком железе. |
 
 **Goal:** Install Ollama + tiny model (0.5B), run 50 HotpotQA questions.
 
+**Ollama на D: диск:**
+- При установке: выбери `D:\Ollama` как путь
+- Или установи на C:, модели храни на D::
+  ```cmd
+  setx OLLAMA_MODELS D:\ollama\models
+  ```
+  Затем перезапусти терминал и `ollama pull qwen2.5:0.5b`
+
 ```bash
 # 1. Install Ollama from https://ollama.com  (~300 MB)
-# 2. Pull tiny model
+
+# 2. Pull tiny model (модель сохранится на D: если задан OLLAMA_MODELS)
 ollama pull qwen2.5:0.5b       # ~398 MB
 
 # 3. Create venv
 python -m venv .venv
 .venv\Scripts\activate
-pip install numpy pyyaml
 
-# 4. Create configs/local.yaml:
+# 4. Install lightweight deps (не путай с тяжёлым requirements.txt для Phase 3!)
+pip install -r requirements-local.txt
+
+# 5. Create configs/local.yaml — уже есть в репозитории, можешь править:
 #     llm:
 #       mode: ollama
 #       model: qwen2.5:0.5b
@@ -53,15 +64,8 @@ pip install numpy pyyaml
 #       max_spirals: 10
 #       verbose: true
 
-# 5. Download 50 HotpotQA questions
-python -c "
-import json, urllib.request
-url = 'https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/main/hotpot_dev_fullwiki_1.json'
-urllib.request.urlretrieve(url, 'data/sample.json')
-"
-
-# 6. Run
-python scripts/run.py --config configs/local.yaml --questions data/sample.json
+# 6. Run with synthetic corpus (первый тест — без скачивания данных)
+python scripts/run.py --config configs/local.yaml
 ```
 
 **Expected performance (qwen2.5:0.5b, CPU):**
@@ -143,6 +147,10 @@ curl -X POST http://localhost:8000/vortex/run \
 | 1A. Laptop (0.5B) | 4 cores | 4 GB | — | ~2 GB | No | ✅ Yes |
 | 1B. GPU cluster | 8 cores | 16 GB | ≥8 GB | ~20 GB | Optional | 🟡 Partial |
 | 2. Production | 16+ cores | 32 GB | ≥24 GB | ~100 GB | Yes | ❌ No |
+
+**Requirements by track:**
+- Phase 0–1A: `pip install -r requirements-local.txt` (numpy, pyyaml, requests — ~15 MB)
+- Phase 1B–2: `pip install -r requirements.txt` (transformers, vllm, faiss — ~2 GB)
 
 ---
 
