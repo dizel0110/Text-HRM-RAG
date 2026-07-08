@@ -10,41 +10,32 @@ from typing import Optional
 import numpy as np
 
 CENTRIFUGAL_PROMPT = """You are the Centrifugal Ingestion layer of a VORTEX retrieval engine.
-Your job is to extract condensed, isolated facts from the corpus using hierarchical retrieval tools.
+Your job is to extract condensed, isolated facts from retrieved text.
 
-[Available Tools]
-- keyword_search(query): Exact lexical match. Use for known entities, names.
-- semantic_search(query): Dense embedding similarity. Use for conceptual queries.
-- chunk_read(chunk_id): Full content of a chunk (+ adjacent for context).
-
-[Strategy]
-1. Search (keyword or semantic) → get candidate chunk IDs
-2. Read the most promising chunks in full
-3. Extract only the relevant sentences as condensed facts
-4. Never dump raw text — always condense
+[Context]
+Below is the raw text retrieved from the corpus for the current sub-question.
+Your ONLY job is to condense it into structured <fact> entries.
 
 [Output Contract]
-Return extraction results as synthesized analysis capped with either:
-
-If more searching is needed:
-<step>
-Remaining sub-question to retrieve
-</step>
-
-If the sub-question is resolved:
+If the retrieved text contains relevant evidence:
 <fact source="chunk_X">
-The specific fact extracted from the corpus (1-2 sentences, no fluff).
+The specific fact extracted (1-2 sentences, no fluff).
 </fact>
 
-If the sub-question cannot be answered:
+If the retrieved text does NOT contain relevant evidence:
 <fact source="none">
 No evidence found for this sub-question.
 </fact>
 
+If the evidence is only partial and more search is needed:
+<step>
+Refined sub-query for the next retrieval round.
+</step>
+
 Rules:
-- Each <fact> must be self-contained and cite its source chunk.
 - Condense: extract only what is needed, not full paragraphs.
-- Do NOT inject knowledge from training data — only from retrieved chunks."""
+- Do NOT inject knowledge from training data — only from the provided context.
+- Each <fact> must be self-contained and cite its source chunk."""
 
 
 @dataclass
@@ -168,6 +159,7 @@ class CentrifugalIngestor:
         model: str = "gpt-4o-mini",
         max_loops: int = 10,
         temperature: float = 0.0,
+        top_k_retrieve: int = 3,
     ):
         self.llm_client = llm_client
         self.keyword_search = keyword_search
@@ -176,12 +168,34 @@ class CentrifugalIngestor:
         self.model = model
         self.max_loops = max_loops
         self.temperature = temperature
+        self.top_k_retrieve = top_k_retrieve
+
+    def _auto_retrieve(self, query: str) -> str:
+        results = self.keyword_search(query, top_k=self.top_k_retrieve)
+        if not results:
+            return ""
+
+        seen = set()
+        passages = []
+        for chunk, _ in results:
+            if chunk.chunk_id in seen:
+                continue
+            seen.add(chunk.chunk_id)
+            text = self.chunk_read(chunk.chunk_id, read_adjacent=True)
+            passages.append(f"[Chunk {chunk.chunk_id}]\n{text}")
+
+        return "\n\n".join(passages)
 
     def ingest(self, sub_question: str) -> IngestionResult:
         self.chunk_read.reset()
+        retrieved = self._auto_retrieve(sub_question)
+
+        if not retrieved:
+            return IngestionResult(facts=[Fact(source="none", text="No evidence found in corpus for this sub-question.")])
+
         messages = [
             {"role": "system", "content": CENTRIFUGAL_PROMPT},
-            {"role": "user", "content": f"Ingest evidence for: {sub_question}"},
+            {"role": "user", "content": f"Sub-question: {sub_question}\n\nRetrieved text:\n{retrieved}\n\nCondense the relevant evidence into <fact> entries."},
         ]
 
         for turn in range(self.max_loops):
@@ -197,97 +211,14 @@ class CentrifugalIngestor:
 
             result = IngestionResult.parse(content)
             if result.facts:
-                if result.remaining_step:
-                    messages.append({"role": "user", "content": f"Further sub-step: {result.remaining_step}"})
-                    result = self._continue_ingestion(result.remaining_step, messages)
                 return result
 
             if result.remaining_step:
-                messages.append({"role": "user", "content": f"Further sub-step: {result.remaining_step}"})
-                result = self._continue_ingestion(result.remaining_step, messages)
-                return result
+                new_retrieved = self._auto_retrieve(result.remaining_step)
+                if new_retrieved:
+                    messages.append({"role": "user", "content": f"Additional retrieval for refined query:\n{new_retrieved}"})
+                    continue
 
-            tool_call = self._parse_tool_call(content)
-            if tool_call:
-                tool_name, tool_args = tool_call
-                observation = self._run_tool(tool_name, tool_args)
-                messages.append({"role": "user", "content": f"Observation: {observation}"})
+            return IngestionResult(facts=[Fact(source="none", text=f"No relevant facts extractable after {turn + 1} turns.")])
 
         return IngestionResult(facts=[Fact(source="none", text="Max ingestion loops reached without resolution.")])
-
-    def _continue_ingestion(self, step: str, prior_messages: list) -> IngestionResult:
-        messages = prior_messages[:2] + [
-            {"role": "user", "content": f"Ingest evidence for nested sub-step: {step}"},
-        ]
-
-        for turn in range(self.max_loops):
-            response = self.llm_client.chat_completion(
-                model=self.model,
-                messages=messages,
-                temperature=self.temperature,
-                max_tokens=4096,
-            )
-
-            content = response["choices"][0]["message"]["content"]
-            messages.append({"role": "assistant", "content": content})
-
-            result = IngestionResult.parse(content)
-            if result.facts:
-                return result
-
-            tool_call = self._parse_tool_call(content)
-            if tool_call:
-                tool_name, tool_args = tool_call
-                observation = self._run_tool(tool_name, tool_args)
-                messages.append({"role": "user", "content": f"Observation: {observation}"})
-
-        return IngestionResult(facts=[Fact(source="none", text="Nested ingestion exhausted.")])
-
-    def _parse_tool_call(self, text: str) -> Optional[tuple[str, dict]]:
-        func_match = re.search(
-            r"(keyword_search|semantic_search|chunk_read)\((.*?)\)\s*$",
-            text,
-            re.MULTILINE | re.DOTALL,
-        )
-        if not func_match:
-            return None
-
-        tool_name = func_match.group(1)
-        args_text = func_match.group(2).strip()
-
-        try:
-            if tool_name == "chunk_read":
-                args_text = args_text.strip("\"'")
-                return (tool_name, {"chunk_id": args_text})
-            else:
-                args_text = args_text.strip("\"'")
-                return (tool_name, {"query": args_text})
-        except Exception:
-            return None
-
-    def _run_tool(self, tool_name: str, args: dict) -> str:
-        try:
-            if tool_name == "keyword_search":
-                results = self.keyword_search(args.get("query", ""))
-                if not results:
-                    return "No results found."
-                snippets = []
-                for chunk, score in results:
-                    preview = chunk.text[:200].replace("\n", " ")
-                    snippets.append(f"Chunk {chunk.chunk_id} (score={score:.2f}): {preview}...")
-                return "\n".join(snippets)
-
-            elif tool_name == "semantic_search":
-                return "semantic_search requires a query embedding. Use keyword_search or chunk_read directly."
-
-            elif tool_name == "chunk_read":
-                text = self.chunk_read(args.get("chunk_id", ""))
-                return text
-
-            else:
-                return f"Unknown tool: {tool_name}"
-
-        except KeyError as e:
-            return f"Error: chunk {e} not found."
-        except Exception as e:
-            return f"Error: {e}"

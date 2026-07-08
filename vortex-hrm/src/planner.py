@@ -7,19 +7,24 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
-GRAVITATIONAL_CORE_PROMPT = """You are the Gravitational Core of a VORTEX retrieval engine.
-You hold ZERO facts in your weights — your sole purpose is structural reasoning and routing.
-Your weights are static synapses. Every inference is a fresh computation from the circulating state.
+GRAVITATIONAL_CORE_PROMPT = """You are a Fact-Free Hierarchical Reasoning Axis.
+You possess ZERO internal factual knowledge about the world.
+Your weights are optimized strictly for multi-step routing — they are static synapses.
+Every inference is a fresh structural computation from the circulating state.
+
+CRITICAL RULES:
+- You are strictly FORBIDDEN from answering the user's question or deducing conclusions unless the exact supporting facts are explicitly present inside the accumulated <fact> entries in spiral_memory.
+- If spiral_memory is empty or insufficient, your ONLY valid action is to emit a new <step> query to fetch more data.
+- Do NOT guess. Do NOT use parametric memory. Every claim must cite a <fact> from spiral_memory.
 
 Your state consists of:
 - goal_vector: the original multi-hop question (immutable)
+- hop_history: the full chronological log of prior reasoning steps, emitted queries, and returned facts
 - spiral_memory: condensed <fact> entries returned from prior executor spins
 - remaining_steps: sub-questions yet to execute
 - hop_count: current spiral depth
 - confidence: accumulated evidence score (0..1)
 - entropy: remaining uncertainty (1.0 = max, 0.0 = converged)
-
-You must NEVER fabricate or recall facts. Every factual claim must cite a <fact> from spiral_memory.
 
 Output one of the following XML structures:
 
@@ -31,17 +36,17 @@ Your structural reasoning based on spiral_memory and remaining_steps.
 Atomic sub-question to retrieve next.
 </step>
 
-2. Terminate the vortex when confidence >= threshold (default 0.85):
+2. Terminate the vortex when all evidence is gathered:
 <think>
-All evidence gathered. Confidence={score} >= threshold. Collapsing vortex.
+Reason for stopping.
 </think>
 <stop_search>
-Reason for stopping.
+Explanation of why no more retrieval is needed.
 </stop_search>
 
-3. Emit final answer once all steps resolved:
+3. Emit final answer once all steps resolved AND facts are in the context:
 <think>
-All sub-questions answered. Synthesizing final result.
+All sub-questions answered. Synthesizing final result from spiral_memory facts.
 </think>
 <final_answer>
 Concise answer grounded in spiral_memory facts.
@@ -51,7 +56,7 @@ Rules:
 - Each <step> must be atomic: one fact per sub-question.
 - Never repeat an already-resolved step.
 - Base every claim on <fact> entries from spiral_memory only.
-- If spiral_memory is empty, emit your first decomposition step."""
+- If spiral_memory is empty, emit your first decomposition step — never a final_answer."""
 
 
 def token_fingerprint(text: str) -> set[str]:
@@ -76,6 +81,16 @@ def jaccard_redundancy(new_text: str, existing_texts: list[str]) -> float:
 
 
 @dataclass
+class HistoryEntry:
+    hop: int
+    reasoning: str
+    step_emitted: Optional[str] = None
+    facts_received: list[str] = field(default_factory=list)
+    stop_reason: Optional[str] = None
+    final_answer: Optional[str] = None
+
+
+@dataclass
 class GravitationalState:
     goal_vector: str
     spiral_memory: list[str] = field(default_factory=list)
@@ -89,6 +104,7 @@ class GravitationalState:
     max_hops: int = 15
     context_budget: int = 8192
     _redundant_count: int = 0
+    history: list[HistoryEntry] = field(default_factory=list)
 
     def build_prompt(self) -> str:
         parts = [f"Goal vector: {self.goal_vector}"]
@@ -96,10 +112,21 @@ class GravitationalState:
         parts.append(f"Confidence: {self.confidence:.2f}")
         parts.append(f"Entropy: {self.entropy:.4f}")
 
-        if self.spiral_memory:
-            parts.append("\nAccumulated facts from prior spins:")
-            for i, fact in enumerate(self.spiral_memory):
-                parts.append(f"  [{i}] {fact}")
+        if self.history:
+            parts.append("\nFull hop history (oldest → newest):")
+            for entry in self.history:
+                parts.append(f"  Hop {entry.hop}:")
+                if entry.reasoning:
+                    parts.append(f"    Reasoning: {entry.reasoning[:200]}")
+                if entry.step_emitted:
+                    parts.append(f"    Query: {entry.step_emitted}")
+                if entry.facts_received:
+                    for fact in entry.facts_received:
+                        parts.append(f"    → {fact}")
+                if entry.stop_reason:
+                    parts.append(f"    Stop: {entry.stop_reason}")
+                if entry.final_answer:
+                    parts.append(f"    Answer: {entry.final_answer}")
 
         if self.remaining_steps:
             parts.append("\nRemaining steps:")
@@ -107,6 +134,16 @@ class GravitationalState:
                 parts.append(f"  [{i}] {step}")
 
         return "\n".join(parts)
+
+    def record_hop(self, spin: "SpinOutput", ingested_facts: Optional[list[str]] = None):
+        self.history.append(HistoryEntry(
+            hop=self.hop_count,
+            reasoning=spin.reasoning,
+            step_emitted=spin.step,
+            facts_received=ingested_facts or [],
+            stop_reason=spin.stop_search,
+            final_answer=spin.final_answer,
+        ))
 
     def ingest_fact(self, fact_entry: str):
         self.spiral_memory.append(fact_entry)
