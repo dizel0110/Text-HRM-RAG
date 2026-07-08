@@ -1,163 +1,146 @@
-# Text-HRM-RAG: Hierarchical Retrieval-Augmented Generation for Multi-Hop Text Question Answering
+# Text-HRM-RAG: Hierarchical Retrieval-Augmented Generation for Multi-Hop Question Answering
 
 ## Project Goal
-Build an **Agentic RAG** system for **multi-hop question answering** over textual data (HotpotQA). The system uses a hierarchical two-level architecture:
 
-1. **High-Level Planner** — decomposes complex multi-hop questions into a chain of atomic sub-questions (XML: `<think>` + `<step>` tags).
-2. **Low-Level Executor** — answers each sub-question by autonomously orchestrating A-RAG style hierarchical retrieval tools (`keyword_search`, `semantic_search`, `chunk_read`).
+Build an **Agentic RAG** system for **multi-hop question answering** (HotpotQA) using a hierarchical planner-executor architecture with a cyclic spiral (vortex) control flow. The system runs **offline-first with zero API keys** and scales from a laptop (4-core CPU, 8 GB RAM) to a GPU cluster.
 
-## Proposed Approach
+## Architecture
 
-We follow the **[A-RAG](https://arxiv.org/abs/2602.03442)** paradigm: expose hierarchical retrieval interfaces directly to the LLM agent, giving it full autonomy over search strategy, execution order, and information consumption.
+### VORTEX Engine
 
-### VORTEX Architecture
+> **VORTEX** = **Vo**rtical **O**ptimization of **R**etrieval and **T**okenized Information Flow **Ex**ecution
 
-> **VORTEX** = **Vo**rtical **O**ptimization of **R**etrieval and **T**okenized Information Flow **Ex**ecution Engine
-
-Instead of a flat, linear ReAct loop or standard sequential RAG, our system treats data flow as a dynamic, cyclic spiral (vortex) centered around a compact, fact-free hierarchical reasoning engine.
-
-#### VORTEX Core Engine
-
-The system is a cyclical informational vortex where tokenized reasoning steps (`<think>`, `<step>`) control the **rotational depth** of retrieval:
+A two-level recurrent attractor network. A fact-free planner (GravitationalCore) decomposes questions into sub-queries; an executor (CentrifugalIngestor) retrieves evidence via a chained tool pipeline. Each rotation (spiral) feeds condensed facts back to the planner, updating its state until entropy converges or confidence crosses threshold.
 
 ```
-                            ┌─────────────────────┐
-                            │   VORTEX Core Loop   │
-                            │  (up to N spirals)   │
-                            └──────┬──────┬───────┘
-                                   │      │
-                    ┌──────────────▼┐    ┌▼──────────────┐
-                    │ Gravitational │    │  Centrifugal  │
-                    │  Core (7B)    │◄──►│  Ingestion    │
-                    │ (0 facts)     │    │ (A-RAG tools) │
-                    └──────────────┘    └───────┬────────┘
-                                                │
-                                      ┌─────────▼────────┐
-                                      │  Document Corpus  │
-                                      └──────────────────┘
+                        ┌───────────────────────────┐
+                        │     VORTEX Engine          │
+                        │ ┌─────────────┐ ┌────────┐ │
+ Question ──────────────┼─►Gravitational│ │Centrif.│ ├──► Answer
+                        │ │ Core        │◄┤Ingestor│ │
+                        │ │ (0 facts)   │ │(tools) │ │
+                        │ └──────┬──────┘ └───┬────┘ │
+                        │        │ <step>      │      │
+                        │        │────────────►│      │
+                        │        │◄────────────│      │
+                        │        │ <fact>      │      │
+                        └───────────────────────────┘
 ```
 
-- **Planner → Executor**: A `<step>` sub-question is launched from the core toward the factual perimeter.
-- **Executor → Planner**: Condensed facts (`<fact>...</fact>`) are spun back inward, updating the planner's hidden state.
-- **Spiral count** $N$: The number of structural hops before the vortex collapses via `<stop_search>` or `<final_answer>`.
+### GravitationalCore (`src/planner.py`)
 
-#### The Gravitational Core (High-Level Planner)
+**Fact-Free reasoning axis.** Holds zero facts in weights — 100% of model capacity is used for structural routing, not memorization.
 
-The 7B model acts as a **factual vacuum** — it holds **zero facts** in its weights. Its capacity is used strictly for:
+**State per spiral:**
+- `goal_vector` — original question (immutable)
+- `spiral_memory` — condensed `<fact>` entries from prior executor spins
+- `hop_history` — full chronological log of reasoning, queries, and results
+- `confidence` / `entropy` — accumulated evidence signal and remaining uncertainty
+- `remaining_steps` — sub-questions yet to execute
 
-- **Structural orientation**: maintaining the multi-hop routing graph
-- **Goal gradients**: tracking which sub-questions remain and how they connect to the original question
-- **Spiral memory**: accumulating condensed fact signatures from prior executor spins
+**Termination conditions:**
+1. `<final_answer>` — planner emits answer from accumulated facts
+2. `<stop_search>` — confidence ≥ threshold or entropy plateau
+3. Max hops — hard upper bound (default 15)
+4. Context budget exceeded
 
-The core never stores or memorizes factual content. Each `<think>` block is a fresh structural computation based on the current spiral state, not a cached lookup.
+### CentrifugalIngestor (`src/executor.py`)
 
-```
-Planner State (per spiral):
-  goal_vector: str          # original question (immutable)
-  spiral_memory: list[str]  # condensed <fact> entries from prior executor spins
-  remaining_steps: list[str] # steps yet to execute
-  hop_count: int            # current spiral depth
-  confidence: float         # accumulated evidence score (0..1)
-```
+**Chained retrieval pipeline** — no LLM tool selection. The executor automatically:
 
-#### The Centrifugal Ingestion (Low-Level Executor)
+1. **keyword_search(query)** — lexical match, top-k chunk IDs
+2. **chunk_read(id, adjacent=True)** — full chunk text + sliding window neighbors
+3. **LLM condensation** — retrieved text fed to LLM only for `<fact>` extraction
 
-The executor's three tools dynamically adjust the **radius of context ingestion**:
+Three tools available (pipeline uses keyword + chunk_read by default; semantic_search requires FAISS index):
 
-| Tool | Radius | Use Case |
-|------|--------|----------|
-| `keyword_search` | Narrow (exact entity match) | Known entities, names, IDs |
-| `semantic_search` | Medium (dense embedding) | Conceptual / fuzzy matches |
-| `chunk_read` | Wide (full context + adjacent) | Deep evidence gathering |
+| Tool | Radius | Use |
+|------|--------|-----|
+| `keyword_search` | Narrow (exact match) | Entities, names, IDs |
+| `semantic_search` | Medium (dense embedding) | Conceptual matches |
+| `chunk_read` | Wide (+ adjacent) | Deep evidence + context |
 
-Raw text retrieved by these tools is **condensed** into isolated `<fact>` entries before being returned to the vortex core. The executor never dumps raw passages into the planner's context window — it extracts, filters, and compresses.
-
-```
-Executor Output Contract:
-<fact source="chunk_42">
-The author of "Book X" is Jane Doe.
-</fact>
-```
-
-#### Vortex Termination
-
-The loop collapses when any of these conditions are met:
-
-1. **`<stop_search>`** — emitted by the planner when confidence > threshold (self-termination)
-2. **`<final_answer>`** — emitted by the planner when all steps are resolved
-3. **Max spirals** $N$ — hard upper bound (default 15) to prevent infinite loops
+### Orchestration (`src/orchestrator.py`)
 
 ```
-Example Collapse Sequence:
-<think>
-All sub-questions resolved. Confidence=0.94 > 0.85. Collapsing vortex.
-</think>
-<final_answer>
-Jane Doe was born in 1925.
-</final_answer>
+loop:
+  spin_output = planner.spin()       # emit <step> or <final_answer>
+  if final_answer: return answer
+  if stop_search:   return synthesize
+  
+  ingestion = executor.ingest(step)  # auto-retrieve + condense
+  for each fact:
+    if not redundant:
+      planner.ingest_fact(fact)      # update state
 ```
 
-### Architecture Diagram
+## Project Structure
 
 ```
-                 ┌──────────────────────────────────────┐
-                 │          VORTEX Engine                │
-                 │  ┌─────────────┐   ┌──────────────┐   │
-  Question ──────┼─►│ Gravitational│   │ Centrifugal  │   ├──────► Answer
-                 │  │ Core        │◄──►│ Ingestion    │   │
-                 │  │ (Planner)   │   │ (Executor)   │   │
-                 │  └──────┬──────┘   └──────┬───────┘   │
-                 │         │  condensed facts  │          │
-                 │         │◄─────────────────│          │
-                 │         │  sub-question     │          │
-                 │         │─────────────────►│          │
-                 └──────────────────────────────────────┘
+Text-HRM-RAG/
+├── vortex-hrm/
+│   ├── src/
+│   │   ├── core/
+│   │   │   ├── config.py       # VORTEXConfig (typed, dict/YAML, no deps)
+│   │   │   └── llm.py          # MockBackend / OllamaBackend / OpenAIBackend
+│   │   ├── planner.py          # GravitationalCore, GravitationalState, HistoryEntry
+│   │   ├── executor.py         # CentrifugalIngestor, chained retrieval
+│   │   ├── orchestrator.py     # VortexEngine cyclic loop
+│   │   └── utils/metrics.py    # EM + F1
+│   ├── scripts/
+│   │   ├── run.py              # Config-driven runner
+│   │   ├── demo.py             # Synthetic corpus demo (mock LLM)
+│   │   ├── eval.py             # EM/F1/Contains/LLM-as-judge
+│   │   ├── batch_runner.py     # Offline evaluation with checkpoint resume
+│   │   └── build_index.py      # FAISS index builder (Phase 3)
+│   ├── configs/
+│   │   ├── mock.yaml           # Offline (default, zero deps)
+│   │   ├── local.yaml          # Ollama + qwen2.5:0.5b
+│   │   └── gpu.yaml            # OpenAI (cluster track)
+│   ├── test_smoke.py           # 17 zero-dependency smoke tests
+│   ├── requirements.txt        # Full deps (Phase 3 — vllm, faiss, transformers)
+│   └── requirements-local.txt  # Light deps (Phase 2 — numpy, pyyaml, requests)
+├── vortex_philosophy.md        # Biomimetic design manifesto
+├── vortex_deployment.md        # Dual-track deployment guide
+└── text_hrm_rag_proposal.md    # This document
 ```
 
-### Data Contract
+## LLM Backends
 
-| Component | Input | Output |
-|-----------|-------|--------|
-| Planner (spin) | `condensed_facts: list[str]` | XML: `<think>...</think>` + `<step>Q</step>` / `<stop_search>` / `<final_answer>` |
-| Executor (execute) | `sub_question: str` | `<fact source="id">text</fact>` (condensed) |
-| VORTEX Engine | `question: str` | `final_answer: str` |
+Config-driven, same code on any hardware:
 
-## Planned Experiments
+| Mode | Backend | Dependencies | API Key | Use Case |
+|------|---------|-------------|---------|----------|
+| `mock` | MockBackend | None | No | Smoke tests, architecture validation |
+| `ollama` | OllamaBackend | requests or openai | No | Local CPU inference |
+| `openai` | OpenAIBackend | openai | Yes | Production / GPU cluster |
 
-1. **Baseline comparison** (HotpotQA):
-   - Direct Answer (no retrieval)
-   - Naive RAG (single-shot embedding retrieval)
-   - A-RAG Full (hierarchical retrieval)
-2. **Ablation**: Remove one tool at a time (w/o keyword, w/o semantic, w/o chunk read).
-3. **Scaling**: Measure EM/F1 vs number of agent loops and token budget.
-4. **Vortex depth**: Impact of spiral count $N$ on answer accuracy and cost.
+```
+VORTEXConfig(llm=LLMConfig(mode="mock"))           # offline
+VORTEXConfig(llm=LLMConfig(mode="ollama", ...))     # local
+VORTEXConfig(llm=LLMConfig(mode="openai", ...))     # cloud
+```
 
-## Expected Results
+## Design Principles
 
-Based on A-RAG paper results on HotpotQA:
+1. **Fact-Free Synapses** — Planner holds zero facts. Every inference is a fresh structural computation from circulating state.
+2. **Entropic Collapse** — Vortex terminates when entropy plateaus (no new information) or confidence crosses threshold.
+3. **Offline-First** — Default mode (`mock`) runs without network, API keys, or model downloads.
+4. **Same Code, Any Hardware** — Config-driven swap between backends. Laptop today, cluster tomorrow.
 
-| Method | LLM-Acc | Cont-Acc |
-|--------|---------|----------|
-| Direct Answer | 45.4 | 40.7 |
-| Naive RAG | 74.5 | 72.9 |
-| **VORTEX (ours)** | **77.1+** | **74.0+** |
+## Evaluation
 
-We expect the VORTEX cyclic architecture to match or exceed the monolithic A-RAG agent by enforcing strict separation of structural reasoning (planner) and factual retrieval (executor).
+| Metric | Description |
+|--------|-------------|
+| Exact Match (EM) | Predicted answer exactly matches ground truth |
+| Token F1 | Token-level overlap between prediction and ground truth |
+| Contains | Ground truth is a substring of prediction |
+| Spirals | Average number of vortex rotations per question |
+| Cost (Phase 3) | Total inference tokens / API cost |
 
-## Current Progress
+## References
 
-- [x] Project skeleton (`vortex-hrm/`)
-  - `src/planner.py` — GravitationalCore with spiral state management
-  - `src/executor.py` — CentrifugalIngestor with condensed fact output
-  - `src/orchestrator.py` — VortexEngine cyclic loop controller
-  - `src/utils/metrics.py` — EM / F1 evaluation
-  - `requirements.txt` — dependencies
-- [x] This proposal document with VORTEX architectural breakdown
-
-## Key References
-
-- **A-RAG Paper**: [arXiv:2602.03442](https://arxiv.org/abs/2602.03442)
-- **A-RAG Code**: [github.com/Ayanami0730/arag](https://github.com/Ayanami0730/arag)
-- **HotpotQA Dataset**: [huggingface.co/datasets/hotpotqa/hotpot_qa](https://huggingface.co/datasets/hotpotqa/hotpot_qa)
-- **MA-RAG**: [arXiv:2505.20096](https://arxiv.org/abs/2505.20096)
-- **Qwen3-Embedding**: [huggingface.co/Qwen/Qwen3-Embedding-0.6B](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)
+- A-RAG: [arXiv:2602.03442](https://arxiv.org/abs/2602.03442)
+- A-RAG code: [github.com/Ayanami0730/arag](https://github.com/Ayanami0730/arag)
+- MA-RAG: [arXiv:2505.20096](https://arxiv.org/abs/2505.20096)
+- HotpotQA: [huggingface.co/datasets/hotpotqa/hotpot_qa](https://huggingface.co/datasets/hotpotqa/hotpot_qa)
