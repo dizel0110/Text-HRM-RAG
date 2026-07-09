@@ -30,3 +30,8 @@ Thumbs.db
 
 # Browser session artifacts
 .playwright-mcp/
+
+# Temp artifacts
+github_proposal_check.txt
+slide2_architecture.png
+slide2_new.png

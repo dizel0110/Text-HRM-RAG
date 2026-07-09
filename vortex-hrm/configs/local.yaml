@@ -1,7 +1,12 @@
-# VORTEX config: laptop track (Ollama + tiny model on CPU)
+# VORTEX config: laptop track (Ollama + 7B model on CPU)
+# Requires qwen2.5:7b (~4.7 GB, works on 8+ GB RAM)
+# Pull: ollama pull qwen2.5:7b
+# NOTE: 0.5B models (qwen2.5:0.5b) CANNOT follow the XML contract —
+#       they pattern-match format instead of executing logic.
+#       Use local-tiny.yaml and simplified prompts if stuck on 0.5B.
 llm:
   mode: ollama
-  model: qwen2.5:0.5b
+  model: qwen2.5:7b
   base_url: http://localhost:11434/v1
   temperature: 0.0
   max_tokens: 2048

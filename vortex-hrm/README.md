@@ -21,7 +21,7 @@ No GPU. No network. No API keys. Just Python 3.10+ and numpy.
 
 | Track | Machine | LLM | Time | Accuracy |
 |-------|---------|-----|------|----------|
-| **A: Laptop** | i5, 8 GB, no GPU | qwen2.5:0.5b via Ollama | ~2 min/QA | Lower (expected) |
+| **A: Laptop** | i5, 8 GB, no GPU | qwen2.5:7b via Ollama | ~2 min/QA | Lower (expected) |
 | **B: GPU cluster** | ≥8 GB VRAM, ≥16 GB RAM | GPT-4o-mini | ~10 s/QA | Paper-level (~77%) |
 
 Same `VORTEXConfig`, same source code. Only the config file changes.
@@ -31,7 +31,7 @@ Same `VORTEXConfig`, same source code. Only the config file changes.
 VORTEXConfig(llm=LLMConfig(mode="mock"))
 
 # Track A — local Ollama
-VORTEXConfig(llm=LLMConfig(mode="ollama", model="qwen2.5:0.5b"))
+VORTEXConfig(llm=LLMConfig(mode="ollama", model="qwen2.5:7b"))
 
 # Track B — cloud OpenAI
 VORTEXConfig(llm=LLMConfig(mode="openai", model="gpt-4o-mini", api_key="..."))

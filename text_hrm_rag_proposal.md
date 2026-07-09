@@ -95,7 +95,8 @@ Text-HRM-RAG/
 │   │   └── build_index.py      # FAISS index builder (Phase 3)
 │   ├── configs/
 │   │   ├── mock.yaml           # Offline (default, zero deps)
-│   │   ├── local.yaml          # Ollama + qwen2.5:0.5b
+│   │   ├── local.yaml          # Ollama + qwen2.5:7b (recommended)
+│   │   ├── local-tiny.yaml     # Ollama + qwen2.5:0.5b (experimental)
 │   │   └── gpu.yaml            # OpenAI (cluster track)
 │   ├── test_smoke.py           # 17 zero-dependency smoke tests
 │   ├── requirements.txt        # Full deps (Phase 3 — vllm, faiss, transformers)
@@ -114,6 +115,8 @@ Config-driven, same code on any hardware:
 | `mock` | MockBackend | None | No | Smoke tests, architecture validation |
 | `ollama` | OllamaBackend | requests or openai | No | Local CPU inference |
 | `openai` | OpenAIBackend | openai | Yes | Production / GPU cluster |
+
+**Model size constraint:** The planner uses an XML-based contract (`<think>`, `<step>`, `<final_answer>`, `<stop_search>`). Models ≤0.5B parameters **cannot** follow this contract — they pattern-match format strings instead of executing logic. Minimum viable model: **7B** (e.g. `qwen2.5:7b`). Smaller models (1.5B-3B) may partially work but should be tested.
 
 ```
 VORTEXConfig(llm=LLMConfig(mode="mock"))           # offline

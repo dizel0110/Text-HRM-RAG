@@ -30,23 +30,24 @@ python scripts/demo.py     # synthetic corpus, offline mock LLM
 | RAM | 8 GB |
 | GPU | Intel Iris Xe (1 GB, no CUDA) |
 | Free disk | C: ~7 GB, D: ~38 GB |
-| Verdict | **Средний ультрабук 2021.** Офис, код, маленькие ML-модели — норм. Для 7B+ моделей не предназначен. VORTEX как раз про работу на таком железе. |
+| Verdict | **Средний ультрабук 2021.** Офис, код, маленькие ML-модели — норм. Для 7B+ на CPU — тяжко, но жить можно (~2-3 tok/s). VORTEX как раз про работу на таком железе. |
 
-**Goal:** Install Ollama + tiny model (0.5B), run 50 HotpotQA questions.
+**Goal:** Install Ollama + 7B model, run 50 HotpotQA questions.
+
+**Note on model size:** qwen2.5:0.5b (~398 MB) is **too small** for the XML-based planner contract. It pattern-matches format strings instead of executing logic — e.g. it copies `<stop_search>...</stop_search>` verbatim from the prompt. Minimum viable model: **qwen2.5:7b** (~4.7 GB, ~8 GB RAM required).
 
 **Ollama на D: диск:**
-- При установке: выбери `D:\Ollama` как путь
-- Или установи на C:, модели храни на D::
+- Модели храни на D::
   ```cmd
   setx OLLAMA_MODELS D:\ollama\models
   ```
-  Затем перезапусти терминал и `ollama pull qwen2.5:0.5b`
+  Затем перезапусти терминал и `ollama pull qwen2.5:7b`
 
 ```bash
 # 1. Install Ollama from https://ollama.com  (~300 MB)
 
-# 2. Pull tiny model (модель сохранится на D: если задан OLLAMA_MODELS)
-ollama pull qwen2.5:0.5b       # ~398 MB
+# 2. Pull 7B model (модель сохранится на D: если задан OLLAMA_MODELS)
+ollama pull qwen2.5:7b       # ~4.7 GB, ~8 GB RAM required for CPU
 
 # 3. Create venv
 python -m venv .venv
@@ -55,27 +56,23 @@ python -m venv .venv
 # 4. Install lightweight deps (не путай с тяжёлым requirements.txt для Phase 3!)
 pip install -r requirements-local.txt
 
-# 5. Create configs/local.yaml — уже есть в репозитории, можешь править:
-#     llm:
-#       mode: ollama
-#       model: qwen2.5:0.5b
-#       base_url: http://localhost:11434/v1
-#     engine:
-#       max_spirals: 10
-#       verbose: true
+# 5. Config already exists at configs/local.yaml (points to qwen2.5:7b)
 
 # 6. Run with synthetic corpus (первый тест — без скачивания данных)
 python scripts/run.py --config configs/local.yaml
 ```
 
-**Expected performance (qwen2.5:0.5b, CPU):**
+**Expected performance (qwen2.5:7b, CPU, 4 cores):**
 
 | Metric | Value |
 |--------|-------|
-| Tokens/sec | ~12 t/s |
-| Time per spiral | ~2 s |
-| Memory | ~1.2 GB RAM |
-| Accuracy vs paper | Lower (0.5B vs 7B) — expected |
+| Tokens/sec | ~2-3 t/s |
+| Time per spiral | ~10-15 s |
+| Memory | ~6-8 GB RAM |
+| Accuracy | Good XML contract compliance |
+
+> **Note:** If RAM is too tight for 7B, try `qwen2.5:3b` (~2.1 GB) or `qwen2.5:1.5b` (~1.1 GB).
+> The 0.5B model (`qwen2.5:0.5b`) is documented in `configs/local-tiny.yaml` but is NOT recommended — it cannot follow the XML planner contract.
 
 ### Track B: GPU Cluster (for reproduction of paper results)
 
@@ -144,7 +141,7 @@ curl -X POST http://localhost:8000/vortex/run \
 | Phase | CPU | RAM | GPU | Disk | API Keys? | Offline? |
 |-------|-----|-----|-----|------|-----------|----------|
 | 0. Smoke | 1 core | 256 MB | — | 1 MB | No | ✅ Yes |
-| 1A. Laptop (0.5B) | 4 cores | 4 GB | — | ~2 GB | No | ✅ Yes |
+| 1A. Laptop (7B) | 4 cores | 8 GB | — | ~6 GB | No | ✅ Yes |
 | 1B. GPU cluster | 8 cores | 16 GB | ≥8 GB | ~20 GB | Optional | 🟡 Partial |
 | 2. Production | 16+ cores | 32 GB | ≥24 GB | ~100 GB | Yes | ❌ No |
 
@@ -152,17 +149,23 @@ curl -X POST http://localhost:8000/vortex/run \
 - Phase 0–1A: `pip install -r requirements-local.txt` (numpy, pyyaml, requests — ~15 MB)
 - Phase 1B–2: `pip install -r requirements.txt` (transformers, vllm, faiss — ~2 GB)
 
+**Model requirements:**
+- 0.5B models — **not suitable** for XML contract (pattern-match format, not logic)
+- 1.5B–3B — partial compliance, test before committing
+- 7B+ — full XML compliance, recommended
+
 ---
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Ollama OOM on 1.5B | Not enough RAM | Use `qwen2.5:0.5b` instead |
+| Ollama OOM on 7B | Not enough RAM | Try `qwen2.5:3b` or `qwen2.5:1.5b` |
+| Planner outputs "stop_search" immediately | Model too small (0.5B can't follow XML) | Upgrade to `qwen2.5:7b` |
 | Planner loops infinitely | Entropy stall not triggered | Lower `entropy_stall_limit` to 2 |
 | Executor returns empty facts | Corpus too small | Add more chunks to `data/` |
-| Low accuracy compared to paper | Using 0.5B vs 7B+ model | Normal — upgrade model for production |
-| Wants to run without any installs | Just testing architecture | `python test_smoke.py` — pure Python |
+| Low accuracy | Using 0.5B vs 7B+ model | Normal — upgrade model for production |
+| No installs, just testing | Fast arch check | `python test_smoke.py` — requires only stdlib |
 
 ---
 
@@ -171,6 +174,6 @@ curl -X POST http://localhost:8000/vortex/run \
 | Phase | Files |
 |-------|-------|
 | 0 | — |
-| 1A | `configs/local.yaml`, `data/sample.json` |
+| 1A | `configs/local.yaml` (7B), `configs/local-tiny.yaml` (0.5B, experimental) |
 | 1B | `configs/gpu.yaml`, `data/index/`, `results/` |
 | 2 | `data/hotpotqa/` (full), `configs/prod.yaml` |

@@ -33,7 +33,7 @@ See [`vortex-hrm/README.md`](vortex-hrm/README.md) for full documentation.
 | Track | Machine | LLM | Config |
 |-------|---------|-----|--------|
 | Offline mock | Any | — | `mode: mock` (default) |
-| Laptop | CPU, 8 GB RAM | qwen2.5:0.5b via Ollama | `configs/local.yaml` |
+| Laptop | CPU, 8 GB RAM | qwen2.5:7b via Ollama | `configs/local.yaml` |
 | Cluster | GPU ≥ 8 GB VRAM | GPT-4o-mini | `configs/gpu.yaml` |
 
 ## References
