@@ -54,12 +54,14 @@ class OllamaBackend:
         base_url: str = "http://localhost:11434/v1",
         temperature: float = 0.0,
         max_tokens: int = 2048,
+        timeout: int = 300,
         use_openai_package: bool = False,
     ):
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.timeout = timeout
         self._use_openai = use_openai_package
 
     def chat_completion(self, **kwargs) -> dict:
@@ -84,7 +86,7 @@ class OllamaBackend:
         resp = requests.post(
             f"{self.base_url}/chat/completions",
             json=payload,
-            timeout=60,
+            timeout=self.timeout,
             headers={"Content-Type": "application/json"},
         )
         resp.raise_for_status()
@@ -174,6 +176,7 @@ def backend_from_config(cfg) -> LLMBackend:
             base_url=getattr(cfg, "base_url", "http://localhost:11434/v1") if hasattr(cfg, "base_url") else cfg.get("base_url", "http://localhost:11434/v1"),
             temperature=getattr(cfg, "temperature", 0.0) if hasattr(cfg, "temperature") else cfg.get("temperature", 0.0),
             max_tokens=getattr(cfg, "max_tokens", 2048) if hasattr(cfg, "max_tokens") else cfg.get("max_tokens", 2048),
+            timeout=getattr(cfg, "timeout", 300) if hasattr(cfg, "timeout") else cfg.get("timeout", 300),
         )
     elif mode == "openai":
         return OpenAIBackend(

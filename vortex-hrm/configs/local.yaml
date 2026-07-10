@@ -10,6 +10,7 @@ llm:
   base_url: http://localhost:11434/v1
   temperature: 0.0
   max_tokens: 2048
+  timeout: 600
 
 engine:
   max_spirals: 10

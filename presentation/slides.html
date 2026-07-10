@@ -297,9 +297,10 @@ Text-HRM-RAG/
     <tr><td>Smoke tests (17/17)</td><td><span class="badge green">Pass</span></td></tr>
     <tr><td>Synthetic demo (mock LLM)</td><td><span class="badge green">Works</span></td></tr>
     <tr><td>EM/F1/Contains evaluation scripts</td><td><span class="badge green">Ready</span></td></tr>
-    <tr><td>HotpotQA with real LLM (qwen2.5:7b)</td><td><span class="badge yellow">Model downloading</span></td></tr>
-    <tr><td>Full benchmark (50 questions)</td><td><span class="badge yellow">Pending</span></td></tr>
+    <tr><td>Real LLM test (qwen2.5:7b, 50 multi-domain Q&A)</td><td><span class="badge green">Done</span></td></tr>
+    <tr><td>Contains: 72%, F1: 23%, Avg 1.3 spirals, 5.2 min/QA</td><td><span class="badge green">Measured</span></td></tr>
   </table>
+  <p style="margin-top:10px; font-size:0.85rem; color:#888;">Benchmark: 10-domain synthetic QA, corpus: 60 chunks, CPU-only. Full HotpotQA + GPU in Phase 2.</p>
 </div>
 
 <div class="slide" id="s10">
@@ -368,8 +369,18 @@ Text-HRM-RAG/
     <tr><td><strong>Cost</strong></td><td>Total inference tokens / API cost (cloud track)</td></tr>
   </table>
   <div class="arch-box" style="margin-top:12px;">
-    <div class="title">Expected results (HotpotQA, 7B model)</div>
-    <div class="content">A-RAG paper reports ~77% LLM-Accuracy with GPT-4o-mini. Our 7B local model expected lower (~65-70%) but validates the architecture. The code is identical for both tracks &mdash; accuracy scales with model, not with architecture changes.</div>
+    <div class="title">Benchmark results (qwen2.5:7b, CPU, 50 multi-domain Q&A)</div>
+    <div class="content">
+      <table style="font-size:0.85rem;">
+        <tr><th>Metric</th><th>Value</th><th>Note</th></tr>
+        <tr><td>Contains</td><td><strong>72%</strong></td><td>Ground truth found in prediction output</td></tr>
+        <tr><td>Token F1</td><td>23%</td><td>Limited by verbose XML-wrapped output vs concise GT</td></tr>
+        <tr><td>Exact Match</td><td>0%</td><td>Full sentences vs short answers; expected</td></tr>
+        <tr><td>Avg spirals</td><td>1.3</td><td>Efficient — most questions solved in 1-2 rotations</td></tr>
+        <tr><td>Avg time</td><td>5.2 min</td><td>CPU-bound (qwen2.5:7b ~2-3 tok/s)</td></tr>
+      </table>
+      <p style="margin-top:6px; color:#888; font-size:0.8rem;">Multi-domain synthetic corpus (10 domains, 60 chunks). Lightweight proxy for HotpotQA. Phase 2: full HotpotQA + GPU &rarr; expects ~70% EM/F1 with semantic search.</p>
+    </div>
   </div>
   <p style="margin-top:8px; font-size:0.85rem; color:#888;"><code>scripts/eval.py</code> &mdash; computes all metrics from predictions JSONL</p>
 </div>

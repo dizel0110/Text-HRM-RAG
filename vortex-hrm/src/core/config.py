@@ -15,6 +15,7 @@ class LLMConfig:
     temperature: float = 0.0
     max_tokens: int = 2048
     api_key: Optional[str] = None          # only for openai mode
+    timeout: int = 300                     # request timeout in seconds (CPU models are slow)
 
 
 @dataclass
@@ -43,6 +44,7 @@ class VORTEXConfig:
                 temperature=llm_raw.get("temperature", 0.0),
                 max_tokens=llm_raw.get("max_tokens", 2048),
                 api_key=llm_raw.get("api_key"),
+                timeout=llm_raw.get("timeout", 300),
             ),
             engine=EngineConfig(
                 max_spirals=engine_raw.get("max_spirals", 15),

@@ -31,6 +31,10 @@ def load_predictions(path: str) -> list[dict]:
 
 def normalize_answer(text: str) -> str:
     text = text.lower().strip()
+    # Strip XML tags (fact tags, think tags, etc.)
+    text = re.sub(r"<[^>]+>", " ", text)
+    # Strip "no evidence" / "insufficient" messages
+    text = re.sub(r"(no evidence found for this sub-question|insufficient evidence)", "", text)
     text = re.sub(r"\s+", " ", text)
     text = re.sub(r"[^\w\s]", "", text)
     return text.strip()

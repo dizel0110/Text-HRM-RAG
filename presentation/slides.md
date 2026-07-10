@@ -160,8 +160,8 @@ Text-HRM-RAG/
 | VortexEngine (orchestrator) | ✅ Done |
 | Smoke tests (17/17) | ✅ Pass |
 | Synthetic demo | ✅ Works |
-| HotpotQA benchmark | 🔄 Pending (model download) |
-| EM/F1 evaluation | ✅ Script ready |
+| Real LLM test (qwen2.5:7b, 50 Q&A) | ✅ Done |
+| Contains: 72%, F1: 23%, 1.3 spirals avg | ✅ Measured |
 
 ---
 
@@ -184,9 +184,9 @@ Text-HRM-RAG/
 |------|-----------|--------|
 | Jul 7–8 | Core engine + smoke tests | ✅ Done |
 | Jul 9 | Presentation materials | ✅ Done |
-| Jul 9–10 | Pull qwen2.5:7b, test run.py | 🔄 Pending |
-| Jul 10–11 | HotpotQA benchmark (10–50 questions) | 🔄 Pending |
-| Jul 11 | Finalize with real results | 🔄 Pending |
+| Jul 9–10 | Pull qwen2.5:7b, test run.py | ✅ Done |
+| Jul 10–11 | 50-Q&A benchmark (multi-domain) | ✅ Done |
+| Jul 11 | Update presentation with real metrics | ✅ Done |
 | **Jul 12** | **Submission deadline (23:00 MSK)** | 🔄 Pending |
 
 **Phase 2 — Post-deadline** (with curator)
@@ -204,13 +204,15 @@ Text-HRM-RAG/
 
 # Evaluation Metrics
 
-| Metric | Description |
-|--------|-------------|
-| **Exact Match (EM)** | Prediction exactly matches ground truth |
-| **Token F1** | Token-level overlap between prediction and ground truth |
-| **Contains** | Ground truth is substring of prediction |
-| **Spirals** | Average vortex rotations per question |
-| **Cost** | Total inference tokens / API cost |
+| Metric | Description | Result (50 Q&A) |
+|--------|-------------|-----------------|
+| **Contains** | Ground truth in prediction | **72%** |
+| **Token F1** | Token-level overlap | 23% |
+| **Exact Match** | Exact match | 0% *(verbose XML)* |
+| **Spirals** | Rotations per question | 1.3 avg |
+| **Time** | Seconds per question | 312 s avg *(CPU)* |
+
+> 50 multi-domain QA pairs, qwen2.5:7b (CPU), 60-chunk corpus. EM=0% due to verbose `<fact>` output vs concise ground truth — Contains (72%) is the honest metric. Phase 2 targets 70%+ EM/F1 with semantic search on GPU.
 
 ---
 

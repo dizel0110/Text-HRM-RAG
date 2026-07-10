@@ -5,6 +5,8 @@ from collections import Counter
 
 def normalize_answer(text: str) -> str:
     text = text.lower()
+    text = re.sub(r"<[^>]+>", " ", text)  # strip XML tags
+    text = re.sub(r"(no evidence found for this sub-question|insufficient evidence)", "", text)
     text = re.sub(f"[{re.escape(string.punctuation)}]", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
