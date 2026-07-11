@@ -94,7 +94,7 @@
     </div>
   </div>
   <div style="margin-top:12px; background:#151528; border:1px solid #2a2a4a; border-radius:6px; padding:10px 14px;">
-    <p style="font-size:0.9rem;"><strong style="color:#667eea;">Key insight:</strong> Inspired by <strong>A-RAG</strong> (arXiv:2602.03442) &mdash; Agentic RAG with tool-augmented retrieval. We replace LLM-driven tool selection with a <strong>fixed chained pipeline</strong>: cheaper, simpler, more predictable.</p>
+    <p style="font-size:0.9rem;"><strong style="color:#667eea;">Key insight:</strong> Inspired by <strong>A-RAG</strong> (<a href="https://arxiv.org/abs/2602.03442" title="A-RAG: Scaling Agentic Retrieval-Augmented Generation via Hierarchical Retrieval Interfaces" style="color:#667eea;">Du et al., 2026</a>) &mdash; Agentic RAG with tool-augmented retrieval. We replace LLM-driven tool selection with a <strong>fixed chained pipeline</strong>: cheaper, simpler, more predictable.</p>
   </div>
 </div>
 
@@ -196,17 +196,51 @@
 
 <div class="slide" id="s5">
   <h2>Cyclic Spiral Flow</h2>
-  <div class="diagram" style="font-size:0.85rem; line-height:1.6;">
-Spiral 1: Planner (empty facts) &rarr; &lt;step&gt; "Who directed Requiem for a Dream?"
-         &rarr; Executor retrieves &rarr; &lt;fact&gt; Darren Aronofsky
-         &rarr; State update: confidence +0.05, entropy -0.15
+  <div style="display:flex; flex-direction:column; gap:8px;">
 
-Spiral 2: Planner sees new fact &rarr; &lt;step&gt; "What was Aronofsky's debut film?"
-         &rarr; Executor retrieves &rarr; &lt;fact&gt; "Pi" (1998)
-         &rarr; State update: confidence +0.10, entropy -0.30
+    <div style="border:1px solid #3a3a6a; border-radius:8px; padding:10px 14px; background:#151530;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <span style="font-weight:700; color:#667eea; font-size:0.9rem;">🌀 Spiral 1</span>
+        <span style="color:#666; font-size:0.75rem;">&mdash; "Who directed Requiem for a Dream?"</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.82rem;">
+        <span style="background:#2a1a4a; color:#a6f; padding:2px 10px; border-radius:4px;">Planner</span>
+        <span style="color:#666;">emits &lt;step&gt;</span>
+        <span style="color:#555;">&rarr;</span>
+        <span style="background:#1a2a4a; color:#6af; padding:2px 10px; border-radius:4px;">Executor</span>
+        <span style="color:#666;">keyword_search &rarr; chunk_read &rarr; LLM</span>
+        <span style="color:#555;">&rarr;</span>
+        <span style="background:#1a4a2a; color:#6f6; padding:2px 10px; border-radius:4px;">Darren Aronofsky</span>
+      </div>
+      <div style="color:#888; font-size:0.75rem; margin-top:3px;">confidence +0.05 &middot; entropy &minus;0.15</div>
+    </div>
 
-Spiral 3: Planner: enough evidence &rarr; &lt;final_answer&gt; Pi
-         &rarr; Vortex collapses. Answer returned.
+    <div style="border:1px solid #6a4a3a; border-radius:8px; padding:10px 14px; background:#1a1528;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <span style="font-weight:700; color:#eaa; font-size:0.9rem;">🌀 Spiral 2</span>
+        <span style="color:#888; font-size:0.75rem;">&mdash; "What was Aronofsky&rsquo;s debut film?"</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.82rem;">
+        <span style="background:#4a2a1a; color:#fa6; padding:2px 10px; border-radius:4px;">Planner</span>
+        <span style="color:#888;">sees &lt;fact&gt; &rarr; next &lt;step&gt;</span>
+        <span style="color:#555;">&rarr;</span>
+        <span style="background:#2a3a4a; color:#8cf; padding:2px 10px; border-radius:4px;">Executor</span>
+        <span style="color:#888;">retrieves more evidence</span>
+        <span style="color:#555;">&rarr;</span>
+        <span style="background:#2a4a2a; color:#8f8; padding:2px 10px; border-radius:4px;">&ldquo;Pi&rdquo; (1998)</span>
+      </div>
+      <div style="color:#888; font-size:0.75rem; margin-top:3px;">confidence +0.10 &middot; entropy &minus;0.30</div>
+    </div>
+
+    <div style="border:1px solid #4a4a3a; border-radius:8px; padding:10px 14px; background:#151518; text-align:center;">
+      <div style="font-weight:700; color:#ae7; font-size:0.85rem; margin-bottom:4px;">&ctdot; Spiral N — repeats until convergence &ctdot;</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:0.82rem;">
+        <span style="background:#2a2a2a; color:#aaa; padding:2px 10px; border-radius:4px;">&lt;final_answer&gt;</span>
+        <span style="color:#666;">or</span>
+        <span style="background:#4a1a1a; color:#f66; padding:2px 10px; border-radius:4px;">entropic collapse</span>
+      </div>
+    </div>
+
   </div>
   <div class="grid" style="margin-top:8px;">
     <div class="card">
@@ -340,8 +374,8 @@ Text-HRM-RAG/
     <tr><td>Jul 7&ndash;8</td><td>Core engine: config, backends, planner, executor, orchestrator, smoke tests</td><td><span class="badge green">Done</span></td></tr>
     <tr><td>Jul 9</td><td>Presentation materials, speaker script, Markdown + HTML + PDF</td><td><span class="badge green">Done</span></td></tr>
     <tr><td>Jul 9&ndash;10</td><td>Pull qwen2.5:7b, test with real LLM (<code>run.py --config local.yaml</code>)</td><td><span class="badge yellow">Model downloading</span></td></tr>
-    <tr><td>Jul 10&ndash;11</td><td>HotpotQA benchmark (10&ndash;50 questions), collect EM/F1 metrics</td><td><span class="badge yellow">Pending</span></td></tr>
-    <tr><td>Jul 11</td><td>Finalize presentation with real results, English review</td><td><span class="badge yellow">Pending</span></td></tr>
+    <tr><td>Jul 10&ndash;11</td><td>Multi-domain benchmark (50 questions), collect EM/F1/Contains metrics</td><td><span class="badge green">Done</span></td></tr>
+    <tr><td>Jul 11</td><td>Finalize presentation with real results, English review</td><td><span class="badge green">Done</span></td></tr>
     <tr><td><strong>Jul 12</strong></td><td><strong>Submission deadline (23:00 MSK)</strong> &mdash; upload PDF + repo</td><td><span class="badge yellow">Pending</span></td></tr>
   </table>
   <p style="font-size:0.8rem; color:#888; margin-top:10px; margin-bottom:6px;"><strong style="color:#667eea;">Phase 2</strong> &mdash; Post-deadline (with curator mentorship)</p>
@@ -411,7 +445,7 @@ model: gpt-4o-mini</pre>
     </div>
     <div class="card" style="grid-column:1/-1; margin-top:4px;">
       <h3>Cost-quality positioning</h3>
-      <p style="font-size:0.85rem;">VORTEX outperforms classic RAG at every hardware tier. On CPU: enables multi-hop where single-pas RAG fails. On GPU: higher accuracy per dollar through iterative focus. Tokens cost <em>more</em>, but <strong>accuracy-per-dollar is higher</strong> — weaker hardware gets viable, stronger hardware gets more precise.</p>
+      <p style="font-size:0.85rem;">VORTEX outperforms classic RAG at every hardware tier. On CPU: enables multi-hop where single-pass RAG fails. On GPU: higher accuracy per dollar through iterative focus. Tokens cost <em>more</em>, but <strong>accuracy-per-dollar is higher</strong> — weaker hardware gets viable, stronger hardware gets more precise.</p>
     </div>
   </div>
 </div>
@@ -420,27 +454,34 @@ model: gpt-4o-mini</pre>
   <h2>References &amp; Links</h2>
   <div class="grid">
     <div class="card">
-      <h3>Papers</h3>
-      <p><strong>A-RAG</strong> (Малых, 2026): <a href="https://arxiv.org/abs/2602.03442" style="color:#667eea;">arXiv:2602.03442</a><br>
-      Hierarchical RAG with deterministic decomposition</p>
-      <p style="margin-top:8px;"><strong>ReAct</strong> (Yao et al., 2022): <a href="https://arxiv.org/abs/2210.03629" style="color:#667eea;">arXiv:2210.03629</a><br>
-      Reasoning + acting agent loop</p>
-      <p style="margin-top:8px;"><strong>Self-Ask</strong> (Press et al., 2022): <a href="https://arxiv.org/abs/2210.03350" style="color:#667eea;">arXiv:2210.03350</a><br>
-      Step-by-step QA decomposition</p>
-      <p style="margin-top:8px;"><strong>Chain-of-Thought</strong> (Wei et al., 2022): <a href="https://arxiv.org/abs/2201.11903" style="color:#667eea;">arXiv:2201.11903</a><br>
-      Stepwise reasoning</p>
-      <p style="margin-top:8px;"><strong>RAPTOR</strong> (Sarthi et al., 2024): <a href="https://arxiv.org/abs/2401.18059" style="color:#667eea;">arXiv:2401.18059</a><br>
-      Hierarchical retrieval</p>
-      <p style="margin-top:8px;"><strong>RAG</strong> (Lewis et al., 2020): <a href="https://arxiv.org/abs/2005.11401" style="color:#667eea;">arXiv:2005.11401</a><br>
-      Retrieval-augmented generation</p>
-      <p style="margin-top:8px;"><strong>HotpotQA</strong> (Yang et al., 2018): <a href="https://arxiv.org/abs/1809.09600" style="color:#667eea;">arXiv:1809.09600</a><br>
-      Multi-hop QA benchmark</p>
+      <h3>Papers (in order of appearance)</h3>
+      <p style="margin-bottom:2px;"><strong>A-RAG</strong> (Du et al., 2026): <a href="https://arxiv.org/abs/2602.03442" title="A-RAG: Scaling Agentic Retrieval-Augmented Generation via Hierarchical Retrieval Interfaces" style="color:#667eea;">arXiv:2602.03442</a><br>
+      <span style="color:#aaa; font-style:italic;">A-RAG: Scaling Agentic Retrieval-Augmented Generation via Hierarchical Retrieval Interfaces</span><br>
+      Agentic RAG with LLM-driven tool selection for retrieval</p>
+      <p style="margin-top:8px; margin-bottom:2px;"><strong>RAG</strong> (Lewis et al., 2020): <a href="https://arxiv.org/abs/2005.11401" title="Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks" style="color:#667eea;">arXiv:2005.11401</a><br>
+      <span style="color:#aaa; font-style:italic;">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</span><br>
+      Foundation of retrieval-augmented generation</p>
+      <p style="margin-top:8px; margin-bottom:2px;"><strong>ReAct</strong> (Yao et al., 2022): <a href="https://arxiv.org/abs/2210.03629" title="ReAct: Synergizing Reasoning and Acting in Language Models" style="color:#667eea;">arXiv:2210.03629</a><br>
+      <span style="color:#aaa; font-style:italic;">ReAct: Synergizing Reasoning and Acting in Language Models</span><br>
+      Reasoning and acting in language model agents</p>
+      <p style="margin-top:8px; margin-bottom:2px;"><strong>Self-Ask</strong> (Press et al., 2022): <a href="https://arxiv.org/abs/2210.03350" title="Measuring and Narrowing the Compositionality Gap in Language Models" style="color:#667eea;">arXiv:2210.03350</a><br>
+      <span style="color:#aaa; font-style:italic;">Measuring and Narrowing the Compositionality Gap in Language Models</span><br>
+      Decomposition of questions via follow-up queries</p>
+      <p style="margin-top:8px; margin-bottom:2px;"><strong>Chain-of-Thought</strong> (Wei et al., 2022): <a href="https://arxiv.org/abs/2201.11903" title="Chain-of-Thought Prompting Elicits Reasoning in Large Language Models" style="color:#667eea;">arXiv:2201.11903</a><br>
+      <span style="color:#aaa; font-style:italic;">Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</span><br>
+      Stepwise reasoning through natural language chains</p>
+      <p style="margin-top:8px; margin-bottom:2px;"><strong>RAPTOR</strong> (Sarthi et al., 2024): <a href="https://arxiv.org/abs/2401.18059" title="RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval" style="color:#667eea;">arXiv:2401.18059</a><br>
+      <span style="color:#aaa; font-style:italic;">RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval</span><br>
+      Hierarchical summarization tree for multi-level retrieval</p>
+      <p style="margin-top:8px; margin-bottom:2px;"><strong>HotpotQA</strong> (Yang et al., 2018): <a href="https://arxiv.org/abs/1809.09600" title="HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering" style="color:#667eea;">arXiv:1809.09600</a><br>
+      <span style="color:#aaa; font-style:italic;">HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering</span><br>
+      Multi-hop QA dataset with gold supporting facts</p>
     </div>
     <div class="card">
       <h3>Code &amp; Data</h3>
-      <p><strong>VORTEX-HRM:</strong> <a href="https://github.com/dizel0110/Text-HRM-RAG" style="color:#667eea;">github.com/dizel0110/Text-HRM-RAG</a></p>
-      <p style="margin-top:8px;"><strong>HotpotQA:</strong> <a href="https://huggingface.co/datasets/hotpotqa/hotpot_qa" style="color:#667eea;">huggingface.co/datasets/hotpotqa/hotpot_qa</a></p>
-      <p style="margin-top:8px;"><strong>Smiles-2026:</strong> <a href="https://smiles.skoltech.ru/" style="color:#667eea;">smiles.skoltech.ru</a></p>
+      <p><strong>VORTEX-HRM:</strong> <a href="https://github.com/dizel0110/Text-HRM-RAG" title="VORTEX-HRM repository" style="color:#667eea;">github.com/dizel0110/Text-HRM-RAG</a></p>
+      <p style="margin-top:8px;"><strong>HotpotQA:</strong> <a href="https://huggingface.co/datasets/hotpotqa/hotpot_qa" title="HotpotQA dataset on Hugging Face" style="color:#667eea;">huggingface.co/datasets/hotpotqa/hotpot_qa</a></p>
+      <p style="margin-top:8px;"><strong>Smiles-2026:</strong> <a href="https://smiles.skoltech.ru/" title="Smiles-2026 Summer School" style="color:#667eea;">smiles.skoltech.ru</a></p>
     </div>
   </div>
   <p style="margin-top:24px; text-align:center; color:#888; font-size:0.85rem;">Smiles-2026 &middot; Summer School of Machine Learning &middot; Skoltech &middot; July 2026</p>

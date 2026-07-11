@@ -1,7 +1,7 @@
 # Speaker Script — VORTEX-HRM Presentation
 
 > Use this script to practice your talk. English text is what you say aloud.
-> Russian text is the deep explanation so you *understand* what you're saying.
+> "Deep understanding" sections explain the reasoning behind the content.
 > Total estimated time: 5-7 minutes (14 slides, ~25-30 sec each).
 
 ---
@@ -16,12 +16,12 @@
 > Our system works exactly like that. Each spiral is one round of thinking and retrieving. The question is at the center. Every rotation pulls in more evidence. When we have enough, the system collapses into a final answer.
 > That's why we call it VORTEX."
 
-**Russian (для понимания):**
-> Идея вихря — ключевая метафора всего проекта. В природе водоворот затягивает материю с периферии в центр. Каждый оборот — новый цикл. Когда материи накопилось достаточно, вихрь схлопывается и утягивает всё на дно.
+**Deep understanding:**
+> The vortex metaphor is the core idea. In nature, a whirlpool pulls matter from the periphery to the center — each rotation is a new cycle. When enough matter accumulates, the vortex collapses.
 >
-> В нашем случае "материя" — это факты из документов. "Водоворот" — это цикл: планировщик задаёт вопрос → исполнитель ищет ответ → факт возвращается → следующий цикл. Когда фактов накопилось достаточно для ответа — система схлопывается и выдаёт финальный ответ.
+> In our case, "matter" is facts from documents. The "whirlpool" is the cycle: planner asks → executor searches → fact returns → next cycle. When enough facts accumulate for an answer, the system collapses into a final answer.
 >
-> Это не просто красивая метафора. Это работает как алгоритм: entropy (энтропия, мера неопределённости) уменьшается с каждым циклом, confidence (уверенность) растёт. Когда энтропия перестаёт меняться — система останавливается.
+> This isn't just a metaphor — it works as an algorithm: entropy decreases each cycle, confidence increases. When entropy stops changing, the system stops.
 
 ---
 
@@ -31,10 +31,10 @@
 > "Good morning everyone. My name is [name], and I'm going to present VORTEX-HRM — a Hierarchical Retrieval-Augmented Generation system for multi-hop question answering.
 > This is my project for the Smiles-2026 summer school."
 
-**Russian (почему мы это делаем):**
-> Представление проекта. VORTEX — Vortical Optimization of Retrieval and Tokenized Information Flow Execution.
-> HRM — Hierarchical Retrieval-Augmented Generation — иерархическая RAG-система.
-> Multi-hop QA — вопросы, требующие нескольких шагов рассуждения. Например: "В каком году родился автор книги 'X'?" — сначала нужно найти автора, потом год рождения.
+**Deep understanding:**
+> VORTEX = Vortical Optimization of Retrieval and Tokenized Information Flow Execution.
+> HRM = Hierarchical Retrieval-Augmented Generation.
+> Multi-hop QA: questions requiring multiple reasoning steps. Example: "What year was the author of book X born?" — first find the author, then find their birth year.
 
 ---
 
@@ -45,17 +45,17 @@
 > You first need to find the director, then find their debut film. That's two hops.
 > Our goal was to build an agentic system that can decompose complex questions, retrieve evidence for each sub-question independently, and converge on an answer when enough evidence is collected. And crucially — it must work offline, with zero API keys, on any machine."
 
-**Russian (глубокое понимание):**
-> Обычный RAG: задал вопрос → поиск по документам → ответ. Один шаг.
-> Multi-hop QA: чтобы ответить, нужно сделать несколько шагов рассуждения, каждый со своим поиском.
+**Deep understanding:**
+> Standard RAG: ask → retrieve → answer. One step.
+> Multi-hop QA: requires several reasoning steps, each with its own retrieval.
 >
-> Пример: "Какой фильм был дебютом режиссёра, в чьих работах есть 'Реквием по мечте'?"
-> Шаг 1: кто режиссёр 'Реквиема по мечте'? → Даррен Аронофски.
-> Шаг 2: какой фильм был его дебютом? → "π" (1998).
+> Example: "Which film marked the debut of the director whose work includes 'Requiem for a Dream'?"
+> Step 1: who directed 'Requiem for a Dream'? → Darren Aronofsky.
+> Step 2: which film was his debut? → "π" (1998).
 >
-> Два шага = два поиска. Обычный RAG так не умеет — он ищет один раз.
+> Two hops = two retrievals. Standard RAG cannot do this — it retrieves once.
 >
-> Важно: мы делаем offline-first — никаких API-ключей, никакого интернета. Можно запустить на любом компьютере. Это ключевое отличие от большинства agentic RAG систем, которые требуют GPT-4.
+> Key: we're offline-first — no API keys, no internet required. Run on any machine. This is a key differentiator from most agentic RAG systems that require GPT-4.
 
 ---
 
@@ -67,14 +67,14 @@
 > The Centrifugal Ingestor — the executor — takes that sub-question, retrieves relevant documents from the corpus, condenses them into facts, and sends them back to the planner.
 > This cycle repeats — each rotation is one spiral — until the system converges."
 
-**Russian:**
-> Два компонента, замкнутых в цикл.
+**Deep understanding:**
+> Two components in a closed loop.
 >
-> Gravitational Core (Планировщик) — не содержит фактов в своих весах. Вообще. Ноль. Это чистый маршрутизатор. Его задача — анализировать текущее состояние (какие факты уже накоплены) и решать: какой следующий шаг сделать.
+> Gravitational Core (Planner) — holds zero facts in its weights. Zero. It's a pure router. Its job: analyze current state (accumulated facts) and decide the next step.
 >
-> Centrifugal Ingestor (Исполнитель) — берёт под-вопрос от планировщика, ищет документы, сжимает их в факты, возвращает обратно.
+> Centrifugal Ingestor (Executor) — takes a sub-question from the planner, retrieves documents, condenses them into facts, returns them.
 >
-> Цикл: Planner → step → Executor → fact → Planner → ... → сходимость.
+> Cycle: Planner → step → Executor → fact → Planner → ... → convergence.
 
 ---
 
@@ -85,24 +85,24 @@
 > Its state includes: the original question — immutable; a spiral memory of condensed facts collected so far; a full hop history — a chronological log of every reasoning step and query; confidence and entropy scores that track convergence; and a list of remaining sub-questions.
 > It terminates when it emits a final answer, decides to stop searching, or when entropy stalls — meaning no new information is coming in."
 
-**Russian:**
-> Ключевой принцип: Fact-Free Synapses. Планировщик не запоминает факты. Его веса отвечают только за логику маршрутизации. Это важно, потому что:
-> - Модель не может "перепутать" факты
-> - Каждый запрос — свежее вычисление, основанное на текущих данных
+**Deep understanding:**
+> Key principle: Fact-Free Synapses. The planner doesn't memorize facts. Its weights handle routing logic only. This matters because:
+> - The model cannot "confuse" facts
+> - Each request is a fresh computation based on current data
 >
-> Состояние планировщика:
-> - goal_vector — оригинальный вопрос (неизменяемый)
-> - spiral_memory — накопленные факты
-> - hop_history — полный лог: что думал → какой шаг сделал → что получил
-> - confidence — уверенность (0→1), растёт с каждым новым непротиворечивым фактом
-> - entropy — энтропия (1→0), мера неопределённости, падает с новыми фактами
+> Planner state:
+> - goal_vector — original question (immutable)
+> - spiral_memory — accumulated facts
+> - hop_history — full log: thought → step → result
+> - confidence (0→1) — increases with each new consistent fact
+> - entropy (1→0) — uncertainty measure, decreases with new facts
 >
-> Условия завершения:
-> 1. Финальный ответ (<final_answer>)
-> 2. Уверенность ≥ порога — stop_search
-> 3. Энтропия перестала меняться — entropic collapse
-> 4. Превышен лимит шагов (15)
-> 5. Превышен бюджет контекста
+> Termination conditions:
+> 1. Final answer (<final_answer>)
+> 2. Confidence ≥ threshold — stop_search
+> 3. Entropy stalls — entropic collapse
+> 4. Step limit exceeded (15)
+> 5. Context budget exceeded
 
 ---
 
@@ -112,20 +112,20 @@
 > "The executor uses what we call a chained retrieval pipeline. Unlike many agentic systems where the LLM decides which tool to call and in what order, our executor has a fixed pipeline: first keyword search for exact matches, then chunk reading with adjacent context for surrounding evidence, then LLM condensation to extract key facts.
 > This is simpler and more reliable than letting the LLM decide tool calls — and it's much cheaper."
 
-**Russian:**
-> В большинстве agentic RAG систем LLM сам решает, какой инструмент вызвать. Мы сделали иначе: фиксированный конвейер.
+**Deep understanding:**
+> Most agentic RAG systems let the LLM decide which tool to call. We do it differently: a fixed pipeline.
 >
 > Pipeline:
-> 1. keyword_search(query) — точный поиск по словам, находит ID чанков
-> 2. chunk_read(id, adjacent=True) — читает чанк целиком + соседние (контекст)
-> 3. LLM конденсация — LLM только сжимает найденный текст в факт
+> 1. keyword_search(query) — exact word match, returns chunk IDs
+> 2. chunk_read(id, adjacent=True) — reads full chunk + neighbors (context)
+> 3. LLM condensation — LLM only compresses found text into a fact
 >
-> Почему так:
-> - Не надо тратить токены на "размышления о выборе инструмента"
-> - Надёжнее — конвейер всегда одинаковый
-> - Дешевле — LLM вызывается только один раз на спираль
+> Why:
+> - No tokens wasted on "tool selection reasoning"
+> - More reliable — pipeline is always the same
+> - Cheaper — LLM is called only once per spiral
 >
-> Три инструмента: keyword_search (точные совпадения), semantic_search (похожие по смыслу, требует FAISS), chunk_read (широкий контекст с соседями).
+> Three tools: keyword_search (exact matches), semantic_search (dense embedding, requires FAISS), chunk_read (wide context with neighbors).
 
 ---
 
@@ -136,25 +136,25 @@
 > Spiral two: the planner sees the new fact, decomposes further, emits the next step. The executor retrieves again.
 > This continues until either the planner can answer from accumulated facts, or confidence reaches the threshold, or entropy stops decreasing — meaning we're not learning anything new."
 
-**Russian (конкретный пример):**
-> Давайте на примере: "В каком году родился автор 'Белой гвардии'?"
+**Deep understanding (concrete example):**
+> Example: "What year was the author of 'The White Guard' born?"
 >
-> Спираль 1:
-> - Планировщик: фактов нет → "Кто автор 'Белой гвардии'?"
-> - Исполнитель: ищет → "Михаил Булгаков"
-> - Планировщик: confidence +0.05, entropy -0.15
+> Spiral 1:
+> - Planner: no facts → "Who wrote 'The White Guard'?"
+> - Executor: searches → "Mikhail Bulgakov"
+> - Planner: confidence +0.05, entropy -0.15
 >
-> Спираль 2:
-> - Планировщик: "В каком году родился Михаил Булгаков?"
-> - Исполнитель: ищет → "1891"
-> - Планировщик: конфа теперь 0.10, энтропия 0.70
+> Spiral 2:
+> - Planner: "What year was Mikhail Bulgakov born?"
+> - Executor: searches → "1891"
+> - Planner: confidence 0.10, entropy 0.70
 >
-> Спираль 3:
-> - Планировщик: достаточно фактов → <final_answer>1891</final_answer>
+> Spiral 3:
+> - Planner: enough facts → <final_answer>1891</final_answer>
 >
-> В реальности спиралей может быть 3-5 для типичного HotpotQA вопроса.
+> In practice, 3-5 spirals for a typical HotpotQA question.
 >
-> Важно: каждое возвращение факта — это update состояния. Планировщик не "помнит" прошлые запросы через веса — он видит их через hop_history.
+> Key: each fact return is a state update. The planner doesn't "remember" past queries via weights — it sees them through hop_history.
 
 ---
 
@@ -167,14 +167,14 @@
 > Third, offline-first — the default mode requires zero dependencies, zero network, zero API keys. Just Python.
 > Fourth, same code, any hardware — we use a configuration file to switch between mock mode for testing, Ollama for local CPUs, and OpenAI for GPU clusters. The code never changes."
 
-**Russian (почему эти принципы важны):**
-> 1. Fact-Free Synapses — это наше главное ноу-хау. Планировщик использует 0% ёмкости для фактов, 100% для маршрутизации. Это значит: модель не может "забыть" факт или "перепутать" даты. Каждый запрос — свежий расчёт.
+**Deep understanding:**
+> 1. Fact-Free Synapses — our main innovation. Planner uses 0% capacity for facts, 100% for routing. The model cannot "forget" a fact or "confuse" dates. Every request is a fresh computation.
 >
-> 2. Entropic Collapse — естественная сходимость. Система сама понимает, когда пора остановиться. Не нужно жёстко задавать количество шагов.
+> 2. Entropic Collapse — natural convergence. The system knows when to stop. No need to hardcode the number of steps.
 >
-> 3. Offline-First — можно запустить на голом Python без интернета. Это не "дополнительная опция", а архитектурное решение: сначала работаем без LLM (mock), потом подключаем.
+> 3. Offline-First — runs on bare Python with no internet. Not an "optional feature" but an architectural decision: first work without LLM (mock), then connect.
 >
-> 4. Same Code, Any Hardware — меняется только config файл. Код ядра один и тот же на ноутбуке и на кластере. Это сильно упрощает разработку и тестирование.
+> 4. Same Code, Any Hardware — only the config file changes. Core code is identical on laptop and cluster. Dramatically simplifies development and testing.
 
 ---
 
@@ -184,18 +184,18 @@
 > "We have three backends. MockBackend for testing — it returns canned responses, no network needed. OllamaBackend for local CPU inference using models like qwen2.5:7b — no API key required. And OpenAIBackend for production GPU clusters.
 > Switching between them is a one-line config change. The same planner, the same executor, the same orchestrator — just a different config."
 
-**Russian (технические детали):**
-> Три backend'а:
+**Deep understanding:**
+> Three backends:
 >
-> mock — для тестов. Не требует ничего. Используется в smoke tests (17 тестов).
+> mock — for testing. No dependencies. Used in smoke tests (17 tests).
 >
-> ollama — локальный. Использует Ollama API (совместимый с OpenAI). Не требует API-ключа. Модели хранятся локально (у нас на D:).
+> ollama — local. Uses Ollama API (OpenAI-compatible). No API key required. Models stored locally.
 >
-> openai — облачный. Требует API-ключ и openai Python package.
+> openai — cloud. Requires API key and openai Python package.
 >
-> Важно про размер модели: маленькие модели (0.5B) НЕ могут следовать XML-контракту планировщика. Они буквально копируют формат из промпта вместо того, чтобы выполнять логику. Минимум — 7B параметров. Это мы выяснили экспериментально.
+> Important: small models (0.5B) CANNOT follow the planner's XML contract. They literally copy the format from the prompt instead of executing logic. Minimum viable model: 7B parameters. We discovered this empirically.
 >
-> Конфиг: YAML файл. Одна строка меняет поведение всей системы.
+> Config: YAML file. One line changes the entire system's behavior.
 
 ---
 
@@ -204,17 +204,17 @@
 **English:**
 > "The project is cleanly organized. The core engine is in the vortex-hrm directory: config, LLM backends, planner, executor, orchestrator. Configs for each mode are separate. Scripts for running, evaluating, and batch processing are ready. And we have 17 smoke tests that validate all core logic — they pass on bare Python with no dependencies."
 
-**Russian:**
-> Структура проекта:
-> - src/core/config.py — типизированный конфиг, загружает YAML
-> - src/core/llm.py — три бекенда
+**Deep understanding:**
+> Project structure:
+> - src/core/config.py — typed config, loads YAML
+> - src/core/llm.py — three backends
 > - src/planner.py — GravitationalCore
 > - src/executor.py — CentrifugalIngestor
-> - src/orchestrator.py — VortexEngine, циклический loop
+> - src/orchestrator.py — VortexEngine, cyclic loop
 >
-> configs/ — готовые конфиги для разных режимов
-> scripts/ — утилиты: run.py, demo.py, eval.py, batch_runner.py
-> test_smoke.py — 17 тестов, проходят на голом Python
+> configs/ — ready configs for different modes
+> scripts/ — utilities: run.py, demo.py, eval.py, batch_runner.py
+> test_smoke.py — 17 tests, pass on bare Python
 
 ---
 
@@ -224,20 +224,20 @@
 > "Here's our current status. All core components are implemented and tested. The smoke test suite passes 17 out of 17. The synthetic demo works end-to-end with mock LLM.
 > We've now completed a 50-question benchmark using qwen2.5:7b on CPU with a multi-domain synthetic corpus spanning 10 domains and 60 chunks. The results: 72% of predictions contain the correct answer, with an average of 1.3 spirals per question at about 5 minutes each — limited by CPU inference speed. This validates the architecture. Full HotpotQA evaluation with GPU and semantic search is planned for Phase 2."
 
-**Russian (честно о статусе):**
-> Что сделано:
-> - Весь движок: config, planner, executor, orchestrator ✅
-> - Все три бекенда: mock, ollama, openai ✅
-> - Smoke tests: 17/17 проходят ✅
-> - Synthetic demo: работает ✅
-> - Реальный тест: 50 вопросов на qwen2.5:7b ✅
-> - Метрики: Contains 72%, F1 23%, 1.3 спирали в среднем ✅
+**Deep understanding:**
+> Done:
+> - Full engine: config, planner, executor, orchestrator ✅
+> - All three backends: mock, ollama, openai ✅
+> - Smoke tests: 17/17 pass ✅
+> - Synthetic demo: works ✅
+> - Real test: 50 questions on qwen2.5:7b ✅
+> - Metrics: Contains 72%, F1 23%, 1.3 avg spirals ✅
 >
-> Что в процессе:
-> - Полный HotpotQA на GPU — Phase 2
-> - Semantic search (FAISS) для улучшения retrieval
+> In progress:
+> - Full HotpotQA on GPU — Phase 2
+> - Semantic search (FAISS) for improved retrieval
 >
-> Почему Contains=72%, а не EM: модель возвращает факты в XML-тегах полными предложениями. Строгий Exact Match не срабатывает, но ответ ВЕРНЫЙ содержится в выводе модели.
+> Why Contains=72% not EM: the model returns facts in XML tags as full sentences. Strict Exact Match fails, but the CORRECT answer is contained in the model output.
 
 ---
 
@@ -251,37 +251,37 @@
 > Fourth, entropic collapse is a reliable convergence mechanism. The system stops naturally when no new information arrives.
 > As a solo developer, I implemented the full stack: configuration system, three LLM backends, the planner, the executor, the orchestrator, 17 smoke tests, evaluation scripts, and all documentation."
 
-**Russian (для понимания):**
-> Четыре ключевых вывода:
+**Deep understanding:**
+> Four key takeaways:
 >
-> 1. **Размер модели критичен.** 0.5B модель не способна следовать XML-контракту. Она буквально копирует шаблон ответа вместо того, чтобы думать. Это важный эмпирический результат — мы не могли просто взять "самую маленькую модель". Нужна 7B+.
+> 1. **Model size is critical.** 0.5B model cannot follow the XML contract. It literally copies the response template instead of thinking. Important empirical result — we couldn't just use the "smallest model." Need 7B+.
 >
-> 2. **Chained pipeline лучше LLM tool selection.** В большинстве agentic систем LLM решает, какой инструмент вызвать. Мы сделали фиксированный конвейер: keyword_search → chunk_read → LLM condensation. Это дешевле (один LLM-вызов вместо трёх), надежнее (нет ошибок выбора), проще в отладке.
+> 2. **Chained pipeline > LLM tool selection.** Most agentic systems let the LLM decide which tool to call. We use a fixed pipeline: keyword_search → chunk_read → LLM condensation. Cheaper (one LLM call instead of three), more reliable (no selection errors), easier to debug.
 >
-> 3. **Fact-free planner работает.** Планировщик не содержит фактов в весах — только логика маршрутизации. Каждый запрос — свежее вычисление из циркулирующего состояния. Это подтверждает нашу ключевую гипотезу.
+> 3. **Fact-free planner works.** The planner holds no facts in weights — only routing logic. Every request is a fresh computation from the circulating state. Validates our core hypothesis.
 >
-> 4. **Entropic collapse надёжен.** Система сама определяет, когда остановиться: если энтропия перестала меняться три раза подряд, значит новая информация не поступает. Не нужно хардкодить количество шагов.
+> 4. **Entropic collapse is reliable.** The system determines when to stop: if entropy hasn't changed for three consecutive spirals, no new information is coming in. No need to hardcode step counts.
 >
-> Про выполненную работу: всё сделано одним человеком — от архитектуры до деплоя.
+> About the work done: everything built by one person — from architecture to deployment.
 
 ---
 
 ## Slide 12 — Timeline & Next Steps
 
 **English:**
-> "Here's our timeline. Phase one is the pre-deadline phase ending July 12. We've completed the core engine and presentation materials. The model is downloading now. Over the next two days, we'll run the HotpotQA benchmark and finalize the results.
+> "Here's our timeline. Phase one is the pre-deadline phase ending July 12. We've completed the core engine and presentation materials. The model is downloading now. Over the next two days, we ran a 50-question multi-domain benchmark on qwen2.5:7b (CPU) and got results: Contains 70-72%, F1 22-23%.
 > Phase two starts after the deadline with curator mentorship. We'll review the architecture together, run a full 500-question evaluation, iterate on retrieval precision and prompts, and prepare the final poster for Smiles-2026."
 
-**Russian (для понимания):**
-> Два этапа timeline.
+**Deep understanding:**
+> Two phases in the timeline.
 >
-> **Phase 1 (до 12 июля):** Промежуточный дедлайн. Мы показываем, что сделали ядро системы, тесты, презентацию. Модель качается, бенчмарк запустится в ближайшие дни.
+> **Phase 1 (before Jul 12):** Intermediate deadline. Show core engine, tests, presentation. Benchmark runs completed.
 >
-> **Phase 2 (после 12 июля):** Работа с куратором. Важно показать в презентации, что мы понимаем: проект не заканчивается дедлайном.
-> - 13-14 июля: ревью архитектуры с куратором — обсуждение XML контракта, pipeline, цикла
-> - 15-18 июля: полный прогон HotpotQA (500 вопросов), сравнение с A-RAG
-> - 19-25 июля: итерация — улучшение retrieval, добавление FAISS, оптимизация промптов
-> - 26-27 июля: финальные результаты, постер на Smiles-2026
+> **Phase 2 (after Jul 12):** Curator mentorship. Project doesn't end at the deadline.
+> - Jul 13-14: architecture review with curator — XML contract, pipeline, cycle logic
+> - Jul 15-18: full HotpotQA run (500 questions), comparison with A-RAG
+> - Jul 19-25: iteration — improve retrieval, add FAISS, optimize prompts
+> - Jul 26-27: final results, poster at Smiles-2026
 
 ---
 
@@ -294,15 +294,15 @@
 > Each question takes about 5 minutes on CPU. On GPU this drops to under 10 seconds.
 > The takeaway: VORTEX architecture is validated. Contains 72% with 1.3 spirals on a 7B CPU model proves the cyclic-spiral approach works. EM and F1 will improve with a better model like GPT-4o-mini in Phase 2, targeting 40%+ EM."
 
-**Russian:**
-> Результаты с qwen2.5:7b (50 вопросов, CPU, два прогона):
+**Deep understanding:**
+> Results with qwen2.5:7b (50 questions, CPU, two runs):
 >
-> - **Contains 70-72%** — стабильно через два прогона. Модель НАХОДИТ правильный ответ в 7 из 10 случаев. Это главная метрика.
-> - **F1 22-23%, EM 0%** — не потому что ответы неправильные, а потому что qwen2.5:7b игнорирует инструкцию "выдай короткий ответ". Вместо "1775" пишет "Jane Austen was born in 1775." Это проблема формата, не архитектуры. GPT-4o-mini решит это.
-> - **1.3 спирали** — большинство вопросов за 1-2 витка. Система не делает лишних шагов.
-> - **~5.5 мин/вопрос** — CPU-bound. На GPU — секунды.
+> - **Contains 70-72%** — stable across two runs. Model FINDS correct answer in 7 of 10 cases. This is our primary metric.
+> - **F1 22-23%, EM 0%** — not because answers are wrong, but because qwen2.5:7b ignores the "output short answer" instruction. Instead of "1775" it writes "Jane Austen was born in 1775." Format issue, not architecture. GPT-4o-mini will fix this.
+> - **1.3 spirals** — most questions in 1-2 rotations. System doesn't make unnecessary steps.
+> - **~5.5 min/question** — CPU-bound. On GPU: seconds.
 >
-> Вывод: архитектура работает. 72% Contains на 7B/CPU — доказательство. EM/F1 упрутся в потолок только из-за модели (7B не следует инструкции). Phase 2 с GPT-4o-mini даст EM 40%+.
+> Conclusion: architecture works. 72% Contains on 7B/CPU is proof. EM/F1 ceiling is only due to the model (7B doesn't follow instructions). Phase 2 with GPT-4o-mini targets EM 40%+.
 
 ---
 
@@ -315,46 +315,47 @@
 >
 > A note on cost. VORTEX uses more tokens than classical RAG — more LLM calls per question. But each call is small, and runs on CPU. Hierarchy shifts the cost curve: you trade token volume for hardware cost. A GPU cluster runs $1,000+ per month. A laptop costs zero additional. For budget-limited teams, SMEs, or offline deployment, this trade-off is critical."
 
-**Russian:**
-> Track A — наш текущий сценарий. Ноутбук i5, 8GB RAM, без GPU. Ollama + qwen2.5:7b на CPU. ~2-3 tok/s. Медленно, но работает. Цель — проверить архитектуру, получить первые метрики.
+**Deep understanding:**
+> Track A — our current scenario. i5 laptop, 8GB RAM, no GPU. Ollama + qwen2.5:7b on CPU. ~2-3 tok/s. Slow but works. Goal: validate architecture, get initial metrics.
 >
-> Track B — для воспроизведения результатов из статьи A-RAG (~77% на HotpotQA). Требует GPU с 8+ GB VRAM. Использует GPT-4o-mini или локальный vLLM.
+> Track B — for reproducing paper results (~77% on HotpotQA from A-RAG). Requires GPU with 8+ GB VRAM. Uses GPT-4o-mini or local vLLM.
 >
-> Код один и тот же. Меняется только configs/local.yaml → configs/gpu.yaml.
+> Same code. Only configs/local.yaml → configs/gpu.yaml changes.
 >
-> **Про деньги.** Да, VORTEX жрёт больше токенов — больше вызовов LLM. Но это не «бюджетный вариант», а более эффективная архитектура на любом железе:
+> **About cost.** Yes, VORTEX consumes more tokens — more LLM calls. But this is not a "budget option" — it's a more efficient architecture at every hardware tier:
 >
-> - **CPU ($0 GPU):** классический RAG на CPU делает один проход и часто ошибается в multi-hop. VORTEX делает несколько маленьких шагов — точность 72% Contains. Multi-hop становится возможным там, где иначе никак.
-> - **GPU ($1k+/мес):** классический RAG упирается в контекст. VORTEX с той же моделью на том же GPU даёт выше точность за счёт итеративного фокуса.
+> - **CPU ($0 GPU):** classic RAG on CPU makes one pass and often fails on multi-hop. VORTEX makes several small steps — 72% Contains accuracy. Multi-hop becomes viable where otherwise impossible.
+> - **GPU ($1k+/mo):** classic RAG hits context limits. VORTEX with the same model on the same GPU gives higher accuracy through iterative focus.
 >
-> Считаем accuracy-per-dollar: VORTEX проигрывает в токенах, но выигрывает в результате на единицу затрат. Для стартапов,中小 бизнеса и офлайн-сценариев это критично.
+> Accuracy-per-dollar: VORTEX loses on tokens but wins on result per unit cost. For startups, SMEs, and offline scenarios, this is critical.
 
-**References:**
-> Этот проект стоит на плечах:
-> - **A-RAG** (Малых, arXiv:2602.03442) — иерархический RAG с декомпозицией
-> - **ReAct** (Yao et al., arXiv:2210.03629) — агентный цикл рассуждение+действие
-> - **Chain-of-Thought** (Wei et al., arXiv:2201.11903) — пошаговое рассуждение
-> - **Self-Ask** (Press et al., arXiv:2210.03350) — декомпозиция вопросов
-> - **RAPTOR** (Sarthi et al., arXiv:2401.18059) — иерархический retrieval
-> - **RAG** (Lewis et al., arXiv:2005.11401) — основа retrieval-augmented generation
-> - **HotpotQA** (Yang et al., arXiv:1809.09600) — multi-hop бенчмарк
+**Deep understanding (comparison with related work):**
+> This project stands on the shoulders of:
+> - **A-RAG** (Du et al., arXiv:2602.03442) — *A-RAG: Scaling Agentic Retrieval-Augmented Generation via Hierarchical Retrieval Interfaces* — Agentic RAG with LLM-driven tool selection for retrieval
+> - **RAG** (Lewis et al., arXiv:2005.11401) — *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks* — Foundation of retrieval-augmented generation
+> - **ReAct** (Yao et al., arXiv:2210.03629) — *ReAct: Synergizing Reasoning and Acting in Language Models* — Reasoning and acting agent loop
+> - **Self-Ask** (Press et al., arXiv:2210.03350) — *Measuring and Narrowing the Compositionality Gap in Language Models* — Decomposition of questions into sub-questions
+> - **Chain-of-Thought** (Wei et al., arXiv:2201.11903) — *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models* — Step-by-step reasoning through language
+> - **RAPTOR** (Sarthi et al., arXiv:2401.18059) — *RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval* — Hierarchical summarization tree for multi-level retrieval
+> - **HotpotQA** (Yang et al., arXiv:1809.09600) — *HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering* — Multi-hop QA benchmark with gold supporting facts
 
-VORTEX отличается от A-RAG тем, что у нас LLM-планировщик (гибкий), а не детерминированный граф (жёсткий). От ReAct — фиксированным конвейером инструментов (дешевле, проще, предсказуемее).
+> VORTEX differs from A-RAG: A-RAG uses LLM-driven tool selection (flexible, expensive). VORTEX uses a fixed chained pipeline (simpler, cheaper, more predictable). From ReAct: VORTEX also separates reasoning from acting, but with structured retrieval vs. free-form tool calls.
 
 ---
 
 ## Slide 15 — References
 
 **English:**
-> "Our work is inspired by A-RAG — Agentic RAG with tool-augmented retrieval. We also reference MA-RAG for multi-agent patterns, and we evaluate on the HotpotQA dataset.
+> "Our work is inspired by A-RAG — Agentic RAG with tool-augmented retrieval. We compare against ReAct, Chain-of-Thought, and Self-Ask for reasoning, and RAPTOR for hierarchical retrieval. We evaluate on multi-domain synthetic QA and plan full HotpotQA in Phase 2.
 > All our code is open source at the link shown."
 
-**Russian:**
-> A-RAG — основная статья, на которой мы базируемся (arXiv:2602.03442). Берём идею tool-augmented retrieval и agentic loop.
-> MA-RAG — мультиагентный RAG (arXiv:2505.20096). Потенциальное направление для расширения.
-> HotpotQA — стандартный бенчмарк для multi-hop QA. 113k вопросов.
+**Deep understanding:**
+> A-RAG (Du et al., arXiv:2602.03442) — base paper. We take the idea of tool-augmented retrieval (keyword_search, semantic_search, chunk_read) and the agentic loop. We differ by using a fixed chained pipeline instead of LLM-driven tool selection.
+> ReAct (Yao et al., arXiv:2210.03629) — reasoning+acting loop. We differ by separating planner from executor with structured retrieval.
+> RAPTOR (Sarthi et al., arXiv:2401.18059) — hierarchical summarization tree. We use a flat chunk approach with spiral iteration instead.
+> HotpotQA (Yang et al., arXiv:1809.09600) — standard multi-hop QA benchmark. 113k questions. Planned for Phase 2 full evaluation.
 >
-> Репозиторий: github.com/dizel0110/Text-HRM-RAG
+> Repository: github.com/dizel0110/Text-HRM-RAG
 
 ---
 
@@ -364,9 +365,9 @@ VORTEX отличается от A-RAG тем, что у нас LLM-планир
 > "Thank you for your attention. I'm happy to take questions.
 > The repository link is on the screen. Feel free to check it out, run the smoke tests yourself — they require nothing but Python."
 
-**Russian:**
-> Благодарность за внимание. Ответы на вопросы.
-> Приглашаю посмотреть код — smoke tests запускаются на любом Python без установки зависимостей.
+**Deep understanding:**
+> Thank the audience. Invite questions.
+> Encourage checking the code — smoke tests run on any Python with no dependencies.
 
 ---
 

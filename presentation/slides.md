@@ -83,18 +83,52 @@ dizel0110 — July 2026
 
 # Cyclic Spiral Flow
 
-```
-Spiral 1: Planner emits <step> → Executor retrieves → Fact returned
-                  ↓
-         State updated (confidence +0.05, entropy -0.15)
-                  ↓
-Spiral 2: Planner sees new fact → emits next <step> →
-         Executor retrieves more evidence
-                  ↓
-         ... repeats until convergence ...
-                  ↓
-         <final_answer> or entropic collapse
-```
+<div style="display:flex; flex-direction:column; gap:8px;">
+
+  <div style="border:1px solid #3a3a6a; border-radius:8px; padding:10px 14px; background:#151530;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+      <span style="font-weight:700; color:#667eea; font-size:0.9rem;">🌀 Spiral 1</span>
+      <span style="color:#666; font-size:0.75rem;">— "Who directed Requiem for a Dream?"</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.82rem;">
+      <span style="background:#2a1a4a; color:#a6f; padding:2px 10px; border-radius:4px;">Planner</span>
+      <span style="color:#666;">emits &lt;step&gt;</span>
+      <span style="color:#555;">→</span>
+      <span style="background:#1a2a4a; color:#6af; padding:2px 10px; border-radius:4px;">Executor</span>
+      <span style="color:#666;">keyword_search → chunk_read → LLM</span>
+      <span style="color:#555;">→</span>
+      <span style="background:#1a4a2a; color:#6f6; padding:2px 10px; border-radius:4px;">Darren Aronofsky</span>
+    </div>
+    <div style="color:#888; font-size:0.75rem; margin-top:3px;">confidence +0.05 · entropy −0.15</div>
+  </div>
+
+  <div style="border:1px solid #6a4a3a; border-radius:8px; padding:10px 14px; background:#1a1528;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+      <span style="font-weight:700; color:#eaa; font-size:0.9rem;">🌀 Spiral 2</span>
+      <span style="color:#888; font-size:0.75rem;">— "What was Aronofsky's debut film?"</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.82rem;">
+      <span style="background:#4a2a1a; color:#fa6; padding:2px 10px; border-radius:4px;">Planner</span>
+      <span style="color:#888;">sees &lt;fact&gt; → next &lt;step&gt;</span>
+      <span style="color:#555;">→</span>
+      <span style="background:#2a3a4a; color:#8cf; padding:2px 10px; border-radius:4px;">Executor</span>
+      <span style="color:#888;">retrieves more evidence</span>
+      <span style="color:#555;">→</span>
+      <span style="background:#2a4a2a; color:#8f8; padding:2px 10px; border-radius:4px;">"Pi" (1998)</span>
+    </div>
+    <div style="color:#888; font-size:0.75rem; margin-top:3px;">confidence +0.10 · entropy −0.30</div>
+  </div>
+
+  <div style="border:1px solid #4a4a3a; border-radius:8px; padding:10px 14px; background:#151518; text-align:center;">
+    <div style="font-weight:700; color:#ae7; font-size:0.85rem; margin-bottom:4px;">⋯ Spiral N — repeats until convergence ⋯</div>
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:0.82rem;">
+      <span style="background:#2a2a2a; color:#aaa; padding:2px 10px; border-radius:4px;">&lt;final_answer&gt;</span>
+      <span style="color:#666;">or</span>
+      <span style="background:#4a1a1a; color:#f66; padding:2px 10px; border-radius:4px;">entropic collapse</span>
+    </div>
+  </div>
+
+</div>
 
 ---
 
@@ -243,13 +277,27 @@ Text-HRM-RAG/
 
 **Repository:** [github.com/dizel0110/Text-HRM-RAG](https://github.com/dizel0110/Text-HRM-RAG)
 
-**References:**
-- A-RAG (Малых, 2026): [arXiv:2602.03442](https://arxiv.org/abs/2602.03442) — hierarchical RAG with deterministic decomposition
-- ReAct (Yao et al., 2022): [arXiv:2210.03629](https://arxiv.org/abs/2210.03629) — reasoning+acting agent loop
-- Self-Ask (Press et al., 2022): [arXiv:2210.03350](https://arxiv.org/abs/2210.03350) — step-by-step QA decomposition
-- Chain-of-Thought (Wei et al., 2022): [arXiv:2201.11903](https://arxiv.org/abs/2201.11903) — stepwise reasoning
-- RAPTOR (Sarthi et al., 2024): [arXiv:2401.18059](https://arxiv.org/abs/2401.18059) — hierarchical retrieval
-- RAG (Lewis et al., 2020): [arXiv:2005.11401](https://arxiv.org/abs/2005.11401) — retrieval-augmented generation
-- HotpotQA (Yang et al., 2018): [arXiv:1809.09600](https://arxiv.org/abs/1809.09600) — multi-hop QA benchmark
+**References** (in order of appearance):
+- **A-RAG** (Du et al., 2026): [`arXiv:2602.03442`](https://arxiv.org/abs/2602.03442)
+  *A-RAG: Scaling Agentic Retrieval-Augmented Generation via Hierarchical Retrieval Interfaces*
+  — Agentic RAG with LLM-driven tool selection for retrieval
+- **RAG** (Lewis et al., 2020): [`arXiv:2005.11401`](https://arxiv.org/abs/2005.11401)
+  *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks*
+  — Foundation of retrieval-augmented generation
+- **ReAct** (Yao et al., 2022): [`arXiv:2210.03629`](https://arxiv.org/abs/2210.03629)
+  *ReAct: Synergizing Reasoning and Acting in Language Models*
+  — Reasoning and acting in language model agents
+- **Self-Ask** (Press et al., 2022): [`arXiv:2210.03350`](https://arxiv.org/abs/2210.03350)
+  *Measuring and Narrowing the Compositionality Gap in Language Models*
+  — Decomposition of questions via follow-up queries
+- **Chain-of-Thought** (Wei et al., 2022): [`arXiv:2201.11903`](https://arxiv.org/abs/2201.11903)
+  *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*
+  — Stepwise reasoning through natural language chains
+- **RAPTOR** (Sarthi et al., 2024): [`arXiv:2401.18059`](https://arxiv.org/abs/2401.18059)
+  *RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval*
+  — Hierarchical summarization tree for multi-level retrieval
+- **HotpotQA** (Yang et al., 2018): [`arXiv:1809.09600`](https://arxiv.org/abs/1809.09600)
+  *HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering*
+  — Multi-hop QA dataset with gold supporting facts
 
 **Smiles-2026:** [smiles.skoltech.ru](https://smiles.skoltech.ru/)
