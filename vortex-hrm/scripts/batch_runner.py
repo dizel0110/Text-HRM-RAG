@@ -164,6 +164,8 @@ def main():
                     "ground_truth": ground_truth,
                     "spirals": hops,
                     "time_s": round(elapsed, 2),
+                    "mode": cfg.llm.mode,
+                    "model": cfg.llm.model,
                 }
                 out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
                 out_f.flush()

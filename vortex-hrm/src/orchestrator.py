@@ -38,10 +38,10 @@ class VortexEngine:
             spin_output = self.planner.spin()
 
             if spin_output.final_answer:
-                return spin_output.final_answer
+                return self.extract_answer(spin_output.final_answer)
 
             if spin_output.stop_search:
-                return self._synthesize_answer()
+                return self.extract_answer(self._synthesize_answer())
 
             if spin_output.step:
                 step_to_resolve = self._current_step_index()
@@ -65,7 +65,7 @@ class VortexEngine:
             if self.planner.state and self.planner.state.is_context_exceeded():
                 break
 
-        return self._synthesize_answer()
+        return self.extract_answer(self._synthesize_answer())
 
     def _current_step_index(self) -> int:
         if self.planner.state is None:
@@ -79,6 +79,38 @@ class VortexEngine:
         text = re.sub(r'<fact\s+source="[^"]*">\s*', '', text)
         text = re.sub(r'\s*</fact>', '', text)
         return text.strip()
+
+    @staticmethod
+    def _clean_text(text: str) -> str:
+        """Strip XML tags, normalize whitespace."""
+        text = re.sub(r'<[^>]+>', ' ', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+    @staticmethod
+    def extract_answer(text: str) -> str:
+        """Clean VORTEX output: strip XML, remove noise, de-duplicate, return concise answer."""
+        if not text:
+            return "Insufficient evidence."
+
+        lines = text.split("\n")
+        facts = []
+        for line in lines:
+            if "<fact" in line or "</fact>" in line:
+                continue
+            if "No evidence found for this sub-question" in line:
+                continue
+            if "Insufficient evidence" in line and len(line.strip()) < 30:
+                continue
+            cleaned = re.sub(r'<[^>]+>', ' ', line).strip()
+            cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+            if cleaned and cleaned not in facts:
+                facts.append(cleaned)
+
+        if not facts:
+            return "Insufficient evidence."
+
+        return "\n".join(facts)
 
     def _gate_fact(self, fact: Fact) -> bool:
         if fact.source == "none":

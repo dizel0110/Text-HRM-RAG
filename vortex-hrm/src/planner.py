@@ -49,7 +49,7 @@ Explanation of why no more retrieval is needed.
 All sub-questions answered. Synthesizing final result from spiral_memory facts.
 </think>
 <final_answer>
-Concise answer grounded in spiral_memory facts.
+Short answer only — just the answer itself, no XML tags, no full sentences, no explanation. Examples: "1775", "Pride and Prejudice", "Marie Curie, 1867", "polonium and radium".
 </final_answer>
 
 Rules:
