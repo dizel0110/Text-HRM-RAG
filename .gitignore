@@ -33,3 +33,16 @@ Thumbs.db
 
 # Scratch / local artifacts (not committed)
 scratch/
+
+papers/
+
+# LaTeX build artifacts (track .tex, .sty, .bib, .pdf deliverables only)
+paper/*.log
+paper/*.aux
+paper/*.out
+paper/*.toc
+paper/*.nav
+paper/*.snm
+paper/*.bbl
+paper/*.blg
+paper/compile_online.py

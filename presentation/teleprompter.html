@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Teleprompter — VORTEX-HRM · Smiles-2026</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0f0f1a; color: #555;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 24px;
+  line-height: 1.65;
+  padding: 20px;
+  min-height: 100vh;
+}
+#container { max-width: 780px; margin: 0 auto; }
+.slide {
+  margin-bottom: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: opacity 0.3s;
+  opacity: 0.15;
+}
+.slide.active {
+  opacity: 1;
+  background: #151528;
+  border-left: 3px solid #667eea;
+}
+.slide.done { opacity: 0.08; }
+.slide.optional { border-left-color: #666; }
+.slide.optional .label { color: #666 !important; }
+.timecode {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 2px;
+  font-family: monospace;
+}
+.label {
+  font-size: 14px;
+  color: #667eea;
+  margin-bottom: 5px;
+  font-family: monospace;
+  font-weight: 600;
+}
+.text { font-size: 24px; color: #444; }
+.word {
+  transition: color 0.08s;
+  display: inline;
+}
+.word.active { color: #e0e0e0; }
+.word.done { color: #888; }
+#controls {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #0a0a14;
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid #1a1a30;
+}
+#controls button {
+  background: #1a1a30; color: #ccc; border: none;
+  padding: 10px 24px; border-radius: 8px;
+  font-size: 18px; cursor: pointer; min-width: 70px;
+}
+#controls button:hover { background: #2a2a4a; color: #fff; }
+#controls button.primary { background: #3a4a6a; }
+#controls button.primary:hover { background: #4a6cf7; }
+#timer { color: #ccc; font-family: monospace; font-size: 20px; margin-left: auto; }
+#info { color: #666; font-size: 14px; margin-left: 12px; }
+</style>
+</head>
+<body>
+<div id="pause-indicator" style="display:none;position:fixed;top:20px;right:20px;background:#4a6cf7;color:#fff;padding:10px 18px;border-radius:12px;font-size:20px;font-weight:bold;font-family:monospace;z-index:100;box-shadow:0 4px 20px rgba(74,108,247,0.4);animation:pulse 0.5s infinite alternate;"></div>
+<div id="container"></div>
+<div id="controls">
+  <button id="btnPlay" class="primary">▶</button>
+  <button id="btnReset">⟳</button>
+  <span id="timer">0:00 / 7:00</span>
+  <span id="info">space start/stop · ← → speed</span>
+</div>
+<style>@keyframes pulse{from{opacity:0.7}to{opacity:1}}</style>
+<script>
+const segments = [
+  {t:"0:00",l:"INTRO (optional)",txt:"Before we dive into the architecture, I want to share a quick mental image. Imagine a whirlpool — a vortex. Water spirals around, pulling information from the edges toward the center. Each rotation brings more material in. Eventually, when enough matter has accumulated, the vortex collapses. Our system works exactly like that. Each spiral is one round of thinking and retrieving. The question is at the center. Every rotation pulls in more evidence. When we have enough, the system collapses into a final answer. That's why we call it VORTEX."},
+  {t:"0:25",l:"S1 · TITLE",txt:"Good morning everyone. My name is [name], and I'm going to present VORTEX-HRM — a Hierarchical Retrieval-Augmented Generation system for multi-hop question answering. This is my project for the Smiles-2026 summer school."},
+  {t:"0:40",l:"S2 · MOTIVATION",txt:"Standard RAG systems retrieve documents once and answer in a single step. But many real-world questions require multiple reasoning hops. For example: 'Which film marked the debut of the director whose work includes Requiem for a Dream?' You first need to find the director, then find their debut film. That's two hops. Our goal was to build an agentic system that can decompose complex questions, retrieve evidence for each sub-question independently, and converge on an answer when enough evidence is collected. And crucially — it must work offline, with zero API keys, on any machine."},
+  {t:"1:10",l:"S3 · ARCHITECTURE",txt:"Here's the high-level architecture. The VORTEX engine has two main components connected in a cyclic loop. The Gravitational Core — the planner — holds zero facts in its weights. It's a pure router. It receives the question, looks at accumulated evidence, and decides what to do next: ask a sub-question, stop searching, or give a final answer. The Centrifugal Ingestor — the executor — takes that sub-question, retrieves relevant documents from the corpus, condenses them into facts, and sends them back to the planner. This cycle repeats — each rotation is one spiral — until the system converges."},
+  {t:"1:35",l:"S4 · GRAVITATIONAL CORE",txt:"The planner is built on a principle we call 'fact-free synapses'. It doesn't memorize any facts during training. Every reasoning step is a fresh computation from the state that's circulating in the system. Its state includes: the original question — immutable; a spiral memory of condensed facts collected so far; a full hop history — a chronological log of every reasoning step and query; confidence and entropy scores that track convergence; and a list of remaining sub-questions. It terminates when it emits a final answer, decides to stop searching, or when entropy stalls — meaning no new information is coming in."},
+  {t:"2:05",l:"S5 · CENTRIFUGAL INGESTOR",txt:"The executor uses what we call a chained retrieval pipeline. Unlike many agentic systems where the LLM decides which tool to call and in what order, our executor has a fixed pipeline: first keyword search for exact matches, then chunk reading with adjacent context for surrounding evidence, then LLM condensation to extract key facts. This is simpler and more reliable than letting the LLM decide tool calls — and it's much cheaper."},
+  {t:"2:25",l:"S6 · CYCLIC SPIRAL FLOW",txt:"Let me walk through one concrete cycle. Spiral one: the planner sees the question and an empty fact list. It emits a step — a sub-question. The executor auto-retrieves evidence and returns a condensed fact. The planner updates its state: confidence goes up slightly, entropy goes down. Spiral two: the planner sees the new fact, decomposes further, emits the next step. The executor retrieves again. This continues until either the planner can answer from accumulated facts, or confidence reaches the threshold, or entropy stops decreasing — meaning we're not learning anything new."},
+  {t:"2:55",l:"S7 · DESIGN PRINCIPLES",txt:"Our design rests on four principles. First, fact-free synapses — the planner doesn't memorize, it routes. Second, entropic collapse — the system naturally converges when no new information is available. Third, offline-first — the default mode requires zero dependencies, zero network, zero API keys. Just Python. Fourth, same code, any hardware — we use a configuration file to switch between mock mode for testing, Ollama for local CPUs, and OpenAI for GPU clusters. The code never changes."},
+  {t:"3:15",l:"S8 · LLM BACKENDS",txt:"We have three backends. MockBackend for testing — it returns canned responses, no network needed. OllamaBackend for local CPU inference using models like qwen2.5:7b — no API key required. And OpenAIBackend for production GPU clusters. Switching between them is a one-line config change. The same planner, the same executor, the same orchestrator — just a different config."},
+  {t:"3:35",l:"S9 · PROJECT STRUCTURE",txt:"The project is cleanly organized. The core engine is in the vortex-hrm directory: config, LLM backends, planner, executor, orchestrator. Configs for each mode are separate. Scripts for running, evaluating, and batch processing are ready. And we have 17 smoke tests that validate all core logic — they pass on bare Python with no dependencies."},
+  {t:"3:50",l:"S10 · CURRENT PROGRESS",txt:"Here's our current status. All core components are implemented and tested. The smoke test suite passes 17 out of 17. The synthetic demo works end-to-end with mock LLM. We've now completed a 50-question benchmark using qwen2.5:7b on CPU with a multi-domain synthetic corpus spanning 10 domains and 60 chunks. The results: 72% of predictions contain the correct answer, with an average of 1.3 spirals per question at about 5 minutes each — limited by CPU inference speed. This validates the architecture. Full HotpotQA evaluation with GPU and semantic search is planned for Phase 2."},
+  {t:"4:20",l:"S11 · KEY LEARNINGS",txt:"I want to share four key things we learned while building this system. First, model size matters more than we expected. We initially tried qwen2.5:0.5b — a 500 million parameter model. It failed completely at following the XML contract. Instead of reasoning, it copied format strings verbatim from the prompt. The minimum viable model is 7 billion parameters. Second, we found that a fixed chained retrieval pipeline — keyword search, then chunk reading, then LLM condensation — works better than letting the LLM decide which tools to call. It's simpler, cheaper, and more predictable. Third, the fact-free planner design works. The planner routes correctly with zero factual knowledge. Fourth, entropic collapse is a reliable convergence mechanism. The system stops naturally when no new information arrives. As a solo developer, I implemented the full stack: configuration system, three LLM backends, the planner, the executor, the orchestrator, 17 smoke tests, evaluation scripts, and all documentation."},
+  {t:"5:05",l:"S12 · TIMELINE",txt:"Here's our timeline. Phase one is the pre-deadline phase ending July 12. We've completed the core engine and presentation materials. Over the next two days, we ran a 50-question multi-domain benchmark on qwen2.5:7b (CPU) and got results: Contains 70-72%, F1 22-23%. Phase two starts after the deadline with curator mentorship. We'll review the architecture together, run a full 500-question evaluation, iterate on retrieval precision and prompts, and prepare the final poster for Smiles-2026."},
+  {t:"5:30",l:"S13 · EVALUATION METRICS",txt:"Two independent benchmark runs give consistent results. Contains is 70-72% across runs — the model finds the correct answer in 7 out of 10 questions. This is our honest metric. Token F1 is 22-23%, and Exact Match is 0%. Why so low? The model outputs full sentences — 'Jane Austen was born in 1775' — while the answer key expects just '1775'. The 7B model ignores our instruction to output short phrases. This is a format limitation, not a reasoning failure. Spirals average 1.3 — one or two rotations per question. Most questions (64%) are solved in 0-1 spirals. Only 5% need three spirals. Each question takes about 5 minutes on CPU. On GPU this drops to under 10 seconds. The takeaway: VORTEX architecture is validated. Contains 72% with 1.3 spirals on a 7B CPU model proves the cyclic-spiral approach works. EM and F1 will improve with a better model like GPT-4o-mini in Phase 2, targeting 40%+ EM."},
+  {t:"6:05",l:"S14 · DEPLOYMENT",txt:"We designed two deployment tracks. Track A runs on a laptop — no GPU, just a CPU with Ollama. This is our current target. Performance is about 2-3 tokens per second with a 7B model — slow but workable. Track B targets a GPU cluster with OpenAI or compatible LLMs — this is for reproducing paper-level results of around 77% accuracy on HotpotQA. The key point: the same source code powers both tracks. Only the config file changes. A note on cost. VORTEX uses more tokens than classical RAG — more LLM calls per question. But each call is small, and runs on CPU. Hierarchy shifts the cost curve: you trade token volume for hardware cost. A GPU cluster runs $1,000+ per month. A laptop costs zero additional. For budget-limited teams, SMEs, or offline deployment, this trade-off is critical."},
+  {t:"6:35",l:"S15 · REFERENCES",txt:"Our work is inspired by A-RAG — Agentic RAG with tool-augmented retrieval. We compare against ReAct, Chain-of-Thought, and Self-Ask for reasoning, and RAPTOR for hierarchical retrieval. We evaluate on multi-domain synthetic QA and plan full HotpotQA in Phase 2. All our code is open source at the link shown."},
+  {t:"6:50",l:"S16 · THANK YOU",txt:"Thank you for your attention. I'm happy to take questions. The repository link is on the screen. Feel free to check it out, run the smoke tests yourself — they require nothing but Python."}
+];
+
+function p(t){const a=t.split(':').map(Number);return a[0]*60+a[1]}
+
+const totalDur = p("7:00");
+const container = document.getElementById('container');
+const timerEl = document.getElementById('timer');
+const btnPlay = document.getElementById('btnPlay');
+const btnReset = document.getElementById('btnReset');
+const infoEl = document.getElementById('info');
+
+let playing=false, curTime=0, animFrame=null, startTs=null, speed=1.0;
+
+// Build word-level data
+let allWords = [];
+segments.forEach((seg,i)=>{
+  const start=p(seg.t);
+  const end=i+1<segments.length?p(segments[i+1].t):totalDur;
+  seg.start=start; seg.dur=end-start;
+  const words = seg.txt.match(/\S+\s*/g) || [];
+  words.forEach(w=>{allWords.push({text:w, segIdx:i});});
+});
+
+function render(){
+  const pauseSec = 1.5;
+  let activeSeg = -1;
+  let isPause = false;
+  let pauseRemaining = 0;
+  const pauseEl = document.getElementById('pause-indicator');
+  if(!pauseEl) return;
+  for(let i=0;i<segments.length;i++){
+    if(curTime>=segments[i].start && curTime<segments[i].start+segments[i].dur){activeSeg=i;break;}
+  }
+
+  let globalWordIdx = 0;
+  if(activeSeg>=0){
+    const seg = segments[activeSeg];
+    const elapsedInSeg = curTime - seg.start;
+    isPause = elapsedInSeg < pauseSec;
+    if(isPause) pauseRemaining = Math.ceil((pauseSec - elapsedInSeg) * 10) / 10;
+    const effectiveElapsed = Math.max(0, elapsedInSeg - pauseSec);
+    const effectiveDur = Math.max(0.1, seg.dur - pauseSec);
+    const progress = Math.min(1, Math.max(0, effectiveElapsed / effectiveDur));
+    let firstWordInSeg = allWords.findIndex(w=>w.segIdx===activeSeg);
+    let lastWordInSeg = allWords.length-1 - [...allWords].reverse().findIndex(w=>w.segIdx===activeSeg);
+    const segWordCount = lastWordInSeg - firstWordInSeg + 1;
+    globalWordIdx = firstWordInSeg + Math.floor(progress * segWordCount);
+    if(globalWordIdx > lastWordInSeg) globalWordIdx = lastWordInSeg;
+  }
+
+  let html = '';
+  for(let i=0;i<segments.length;i++){
+    const seg=segments[i];
+    let cls='slide';
+    if(i===activeSeg) cls+=' active';
+    else if(curTime>=seg.start+seg.dur) cls+=' done';
+    if(i===0) cls+=' optional';
+
+    let segWords = allWords.filter(w=>w.segIdx===i);
+    let firstWI = allWords.findIndex(w=>w.segIdx===i);
+
+    let textHtml = segWords.map((w,wi)=>{
+      const gIdx = firstWI + wi;
+      let wc = 'word';
+      if(gIdx < globalWordIdx) wc+=' done';
+      else if(gIdx === globalWordIdx) wc+=' active';
+      return `<span class="${wc}">${w.text}</span>`;
+    }).join('');
+
+    html+=`<div class="${cls}">
+      <div class="timecode">${seg.t}</div>
+      <div class="label">${seg.l}</div>
+      <div class="text">${textHtml}</div>
+    </div>`;
+  }
+  container.innerHTML=html;
+
+  const act=document.querySelector('.slide.active');
+  if(act) act.scrollIntoView({behavior:'smooth',block:'center'});
+
+  const m=Math.floor(curTime/60), s=Math.floor(curTime%60);
+  timerEl.textContent=`${m}:${s.toString().padStart(2,'0')} / 7:00`;
+
+  if(isPause && playing){
+    pauseEl.style.display='block';
+    pauseEl.textContent='⟳ READY '+pauseRemaining.toFixed(1)+'s';
+  } else {
+    pauseEl.style.display='none';
+  }
+
+  if(activeSeg>=0){
+    const seg=segments[activeSeg];
+    if(isPause && playing){
+      infoEl.textContent=seg.l+' · prepare · ×'+speed.toFixed(1);
+    } else {
+      const left=Math.round(seg.start+seg.dur-curTime);
+      infoEl.textContent=seg.l+' — '+left+'s · ×'+speed.toFixed(1);
+    }
+  } else if(curTime>=totalDur){
+    infoEl.textContent='Done!';
+    pauseEl.style.display='none';
+  }
+}
+
+function tick(ts){
+  if(!startTs) startTs=ts;
+  const el=(ts-startTs)/1000;
+  curTime=el*speed;
+  if(curTime>=totalDur){curTime=totalDur;playing=false;btnPlay.textContent='▶';render();return;}
+  render();
+  animFrame=requestAnimationFrame(tick);
+}
+
+btnPlay.onclick=()=>{
+  if(playing){playing=false;btnPlay.textContent='▶';cancelAnimationFrame(animFrame);}
+  else{playing=true;btnPlay.textContent='⏸';startTs=null;animFrame=requestAnimationFrame(tick);}
+};
+btnReset.onclick=()=>{
+  playing=false;btnPlay.textContent='▶';cancelAnimationFrame(animFrame);
+  curTime=0;startTs=null;render();
+};
+document.onkeydown=e=>{
+  if(e.code==='Space'){e.preventDefault();btnPlay.click();}
+  if(e.code==='KeyR')btnReset.click();
+  if(e.code==='ArrowRight'){speed=Math.min(3,speed+0.1);render();}
+  if(e.code==='ArrowLeft'){speed=Math.max(0.3,speed-0.1);render();}
+};
+
+render();
+</script>
+</body>
+</html>
