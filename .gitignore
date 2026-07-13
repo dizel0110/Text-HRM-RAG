@@ -36,6 +36,9 @@ scratch/
 
 papers/
 
+# Duplicate presentation (identical to slides.pdf)
+presentation/Text-HRM-RAG.pdf
+
 # LaTeX build artifacts (track .tex, .sty, .bib, .pdf deliverables only)
 paper/*.log
 paper/*.aux
