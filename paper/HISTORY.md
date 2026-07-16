@@ -145,3 +145,33 @@ Structure:
 7. Final: aggregate all checkpoints → full report
 
 Badge: `[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](...)`
+
+### Final colab-notebook design (v2 — auto-push)
+
+Notebook: `notebooks/vortex_benchmark_colab.ipynb`
+
+**Workflow (для пользователя):**
+1. Создать GitHub token (классический, scope `repo`) → сохранить в Colab (🔑 Secrets → `GITHUB_TOKEN`)
+2. Открыть [ноутбук](https://colab.research.google.com/github/dizel0110/Text-HRM-RAG/blob/main/notebooks/vortex_benchmark_colab.ipynb) → Run All
+3. Результаты автоматом сохраняются в `notebooks/colab_runs/<timestamp>/` и пушатся на GitHub
+4. Пользователь пишет мне: «результат в колабе»
+5. Я захожу в репо, вижу метрики, предлагаю следующий эксперимент
+
+**Workflow (для меня):**
+1. Анализирую `predictions.jsonl` + `meta.json`
+2. Меняю код/конфиг → `git push`
+3. Пользователь: Run All → новый `colab_runs/<timestamp>/` с новыми параметрами
+4. Сравниваю runs между собой
+
+**Структура runs:**
+```
+notebooks/colab_runs/
+├── 2026-07-16_22-05-00/
+│   ├── meta.json              ← параметры эксперимента
+│   ├── predictions.jsonl      ← 50 ответов (question, prediction, ground_truth, spirals, time_s)
+│   ├── checkpoint.json        ← чекпоинт для resume
+│   └── errors.log             ← ошибки
+├── 2026-07-17_14-30-00/
+│   └── ...
+└── .gitkeep
+```
