@@ -105,3 +105,43 @@ pdflatex -interaction=nonstopmode sspp-paper.tex
 
 - T2A (Cyrillic) not available in basic MiKTeX — Russian abstract after `\end{document}` included as comment
 - Deadline discrepancy: OpenReview shows Jul 22, email says Aug 2 — to clarify with organizers
+
+## 2026-07-16 — GPU benchmarking infrastructure plan
+
+### Context
+
+Yandex DataSphere credentials received (5M units limit), but captcha blocks automated access.
+Decision: start with Google Colab (free, instant), keep DataSphere as fallback.
+
+### Platform comparison
+
+| Feature | Google Colab | Kaggle | Yandex DataSphere |
+|---------|-------------|--------|-------------------|
+| Free GPU | T4 (sometimes V100/A100) | P100 / T4, 30h/week | 5M units (school allocation) |
+| Session limit | 12h (~4-6h without Pro) | 9h max | until units run out |
+| Auto-shutdown | **yes** (~4h idle) | **yes** (~1h idle) | configurable |
+| Install ollama | ✅ `!curl ...` | ✅ `!curl ...` | ✅ via Docker/job |
+| Save results | Google Drive | Kaggle Datasets | built-in storage |
+| Reliability | medium (drops sessions) | medium | high (managed cloud) |
+| Setup time | 5 min | 5 min | 30 min (+ captcha/CLI) |
+
+### Strategy
+
+1. **Primary**: Google Colab — instant setup, public notebook, checkpoint to Google Drive
+2. **Fallback**: Yandex DataSphere — 5M units, g1.1 V100 for longer runs
+3. **Checkpoint design**: serialize results as JSON every N questions → resume on reconnect
+
+### Google Colab notebook design
+
+File: `notebooks/vortex_benchmark_colab.ipynb`
+
+Structure:
+1. Mount Google Drive (persistent storage)
+2. Clone `dizel0110/Text-HRM-RAG` (public repo, no token)
+3. Install ollama + pull `qwen2.5:7b`
+4. Run benchmark in batches of 10 questions
+5. After each batch: save `results_checkpoint.json` to Drive
+6. On restart: detect existing checkpoint → skip completed → resume from next
+7. Final: aggregate all checkpoints → full report
+
+Badge: `[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](...)`

@@ -2,6 +2,8 @@
 
 > Hierarchical Retrieval-Augmented Generation with biomimetic spiral architecture.
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dizel0110/Text-HRM-RAG/blob/main/notebooks/vortex_benchmark_colab.ipynb)
+
 Multi-hop question answering over HotpotQA — a planner-executor agentic RAG system inspired by [A-RAG (arXiv:2602.03442)](https://arxiv.org/abs/2602.03442).
 
 **Design principle:** The planner holds zero facts in its weights (fact-free synapses). Every inference is a fresh structural computation from circulating state. The system terminates when entropy plateaus or confidence crosses threshold.
@@ -34,6 +36,7 @@ See [`vortex-hrm/README.md`](vortex-hrm/README.md) for full documentation.
 |-------|---------|-----|--------|
 | Offline mock | Any | — | `mode: mock` (default) |
 | Laptop | CPU, 8 GB RAM | qwen2.5:7b via Ollama | `configs/local.yaml` |
+| Colab (free) | T4 GPU, 12h session | qwen2.5:7b via Ollama | [`notebooks/vortex_benchmark_colab.ipynb`](notebooks/vortex_benchmark_colab.ipynb) |
 | Cluster | GPU ≥ 8 GB VRAM | GPT-4o-mini | `configs/gpu.yaml` |
 
 ## References
