@@ -71,3 +71,37 @@ Output:
 - `latexonline.cc` — 404 on POST `/compile`
 - `texlive.net` — "Bad form type"
 - Conclusion: local MiKTeX via Scoop is the reliable path
+
+## 2026-07-16 — Adapted to Zapiski POMI template (SSPP OpenReview)
+
+### Context
+
+Smiles-2026 organizers announced paper submission via OpenReview:
+- Platform: https://openreview.net/group?id=smiles.skoltech.ru/SSPP/2026
+- Template: Zapiski POMI (https://github.com/madrugado/template-zapiski)
+- Deadline: August 2, 2026 (21:00 MSK)
+- Requirements: ≤10 pp, not anonymized, list authors + mentor, Contribution section
+
+### Changes
+
+- `sspp-paper.tex` fully rewritten from `article`+`neurips_2026.sty` to `\documentclass{zapiski}`
+- Template files downloaded: `zapiski.cls`, `template.tex`
+- `refs.bib` replaced by inline `thebibliography` environment (template requirement)
+- Author metadata: real name (Valentin Malykh as mentor), GitHub handle, DOI-style formatting
+- Added Acknowledgments (mentor credit) and Contribution sections
+- Removed unused build artifacts
+
+### Compilation
+
+```powershell
+pdflatex -interaction=nonstopmode sspp-paper.tex
+```
+
+| PDF | Pages | Size |
+|-----|-------|------|
+| `paper/sspp-paper.pdf` | 5 | 95 KB |
+
+### Known issues
+
+- T2A (Cyrillic) not available in basic MiKTeX — Russian abstract after `\end{document}` included as comment
+- Deadline discrepancy: OpenReview shows Jul 22, email says Aug 2 — to clarify with organizers
