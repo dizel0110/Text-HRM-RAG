@@ -102,7 +102,7 @@ def main():
 
             try:
                 start = time.time()
-                top_k = kws.search(question, k=3)
+                top_k = kws(question, top_k=3)
                 context = "\n---\n".join(f"[{c.chunk_id}] {c.text}" for c, _ in top_k)
                 prompt = prompt_template.format(context=context, question=question)
                 response = backend.chat_completion(
