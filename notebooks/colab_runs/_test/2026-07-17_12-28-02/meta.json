@@ -1,0 +1,11 @@
+{
+  "mode": "test",
+  "run_id": "2026-07-17_12-28-02",
+  "config": "configs/local.yaml",
+  "model": "qwen2.5:7b",
+  "num_questions": 5,
+  "questions": "/tmp/questions_test.json",
+  "corpus": "data/multi_domain/corpus.json",
+  "engine": "VortexEngine",
+  "colab_gpu": "T4"
+}
