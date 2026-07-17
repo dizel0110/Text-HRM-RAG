@@ -36,7 +36,8 @@ See [`vortex-hrm/README.md`](vortex-hrm/README.md) for full documentation.
 |-------|---------|-----|--------|
 | Offline mock | Any | — | `mode: mock` (default) |
 | Laptop | CPU, 8 GB RAM | qwen2.5:7b via Ollama | `configs/local.yaml` |
-| Colab (free) | T4 GPU, 12h session | qwen2.5:7b via Ollama | [`notebooks/vortex_benchmark_colab.ipynb`](notebooks/vortex_benchmark_colab.ipynb) |
+| Colab (test) | CPU/GPU, ~25 мин | qwen2.5:7b via Ollama | `configs/local.yaml` |
+| Colab (full) | T4 GPU, 12h session | qwen2.5:7b via Ollama | `configs/colab-gpu.yaml` |
 | Cluster | GPU ≥ 8 GB VRAM | GPT-4o-mini | `configs/gpu.yaml` |
 
 ## References

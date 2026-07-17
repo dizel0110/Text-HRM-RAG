@@ -1,0 +1,17 @@
+# VORTEX config: Colab T4 GPU track (Ollama + 7B model on NVIDIA T4)
+# 3-5x faster than CPU. Works on Colab's free T4 GPU.
+# Requires: Colab notebook with ollama installed
+llm:
+  mode: ollama
+  model: qwen2.5:7b
+  base_url: http://localhost:11434/v1
+  temperature: 0.0
+  max_tokens: 4096
+  timeout: 120
+
+engine:
+  max_spirals: 15
+  confidence_threshold: 0.85
+  entropy_stall_limit: 3
+  context_budget: 8192
+  verbose: true
