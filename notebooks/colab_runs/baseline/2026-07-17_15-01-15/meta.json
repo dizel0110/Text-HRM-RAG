@@ -1,0 +1,12 @@
+{
+  "mode": "full",
+  "run_id": "2026-07-17_15-01-15",
+  "config": "colab-gpu.yaml",
+  "model": "qwen2.5:7b",
+  "num_questions": 50,
+  "questions": "/content/Text-HRM-RAG/vortex-hrm/data/multi_domain/questions.json",
+  "corpus": "data/multi_domain/corpus.json",
+  "engine": "VortexEngine",
+  "run_type": "baseline",
+  "colab_gpu": "T4"
+}
