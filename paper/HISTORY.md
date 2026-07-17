@@ -199,6 +199,21 @@ notebooks/colab_runs/
 - Avg spirals: 1.6, Avg time: 59 sec/q, total 49 min
 - EM: 0%, F1: 19.9%
 
+### 2026-07-17 — Directory structure cleanup + checkpoint fix
+
+**Итоговая структура runs:**
+```
+notebooks/colab_runs/
+├── vortex/                      ← VORTEX-HRM замеры
+│   ├── 2026-07-17_13-42-30/     ← первый полный прогон (74% Contains)
+│   └── _test/
+│       └── 2026-07-17_12-28-02/ ← тестовый прогон
+├── baseline/                    ← Naive RAG замеры (будет после прогона)
+└── .gitkeep
+```
+
+**Fix:** Чекпоинты VORTEX и baseline теперь хранятся раздельно на Google Drive. Каждый `RUN_TYPE` — своя папка.
+
 **Notebook v3 — RUN_TYPE:**
 - `RUN_TYPE = "vortex"` / `"baseline"` — выбор эксперимента
 - `baseline_rag.py` — Naive RAG (один retrieve + LLM, без вихря)
