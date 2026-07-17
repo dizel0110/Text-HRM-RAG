@@ -233,7 +233,13 @@ notebooks/colab_runs/
 
 **Главный вывод для статьи:** VORTEX превосходит Naive RAG по полноте ответов (Contains +6%, No evidence -14%) за счёт многошагового поиска. Baseline отвечает быстрее и короче, но чаще не находит нужную информацию (24% vs 10%).
 
-**Notebook v3 — RUN_TYPE:**
-- `RUN_TYPE = "vortex"` / `"baseline"` — выбор эксперимента
-- `baseline_rag.py` — Naive RAG (один retrieve + LLM, без вихря)
-- Badge fix, GPU check при full mode
+### 2026-07-17 — Ablation infrastructure
+
+- `ABLATION_SPIRALS = 1/5/10/15/25` — override max_spirals в конфиге
+- Результаты → `vortex/ablation/max_<N>/<timestamp>/`
+- План: 5 прогонов по 50 Q ≈ 4 ч на T4
+
+**Notebook v4 — RUN_TYPE + ABLATION_SPIRALS:**
+- `RUN_TYPE = "vortex"` / `"baseline"`
+- `ABLATION_SPIRALS = None` (обычный) или число (ablation)
+- Автоочистка чекпоинтов перед каждым запуском
