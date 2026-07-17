@@ -5,8 +5,7 @@ __pycache__/
 .venv/
 .venx/
 
-# Data (generated)
-data/
+# Results (generated per run)
 results/
 
 # Configs with secrets

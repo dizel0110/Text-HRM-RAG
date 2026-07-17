@@ -1,0 +1,202 @@
+[
+  {
+    "question": "What year was Jane Austen born?",
+    "ground_truth": "1775"
+  },
+  {
+    "question": "What novel did Jane Austen write that was published in 1813?",
+    "ground_truth": "Pride and Prejudice"
+  },
+  {
+    "question": "Where was Jane Austen born?",
+    "ground_truth": "Steventon, England"
+  },
+  {
+    "question": "In what country was Jane Austen born?",
+    "ground_truth": "England"
+  },
+  {
+    "question": "Who wrote 'Pride and Prejudice' and where were they born?",
+    "ground_truth": "Jane Austen, Steventon, England"
+  },
+  {
+    "question": "What year was Marie Curie born?",
+    "ground_truth": "1867"
+  },
+  {
+    "question": "What elements did Marie Curie discover?",
+    "ground_truth": "polonium and radium"
+  },
+  {
+    "question": "In what country was Marie Curie born?",
+    "ground_truth": "Poland"
+  },
+  {
+    "question": "What Nobel Prizes did Marie Curie win?",
+    "ground_truth": "Physics in 1903 and Chemistry in 1911"
+  },
+  {
+    "question": "Who discovered radium and in what year were they born?",
+    "ground_truth": "Marie Curie, 1867"
+  },
+  {
+    "question": "What year was Beethoven born?",
+    "ground_truth": "1770"
+  },
+  {
+    "question": "How many symphonies did Beethoven compose?",
+    "ground_truth": "9"
+  },
+  {
+    "question": "What was Beethoven's most famous symphony?",
+    "ground_truth": "Symphony No. 9"
+  },
+  {
+    "question": "What physical challenge did Beethoven face?",
+    "ground_truth": "He lost his hearing"
+  },
+  {
+    "question": "Who composed 9 symphonies and was born in Germany?",
+    "ground_truth": "Ludwig van Beethoven"
+  },
+  {
+    "question": "What year was Muhammad Ali born?",
+    "ground_truth": "1942"
+  },
+  {
+    "question": "What was Muhammad Ali's birth name?",
+    "ground_truth": "Cassius Clay"
+  },
+  {
+    "question": "How many times did Muhammad Ali win the heavyweight title?",
+    "ground_truth": "three"
+  },
+  {
+    "question": "What is Muhammad Ali's famous catchphrase?",
+    "ground_truth": "float like a butterfly, sting like a bee"
+  },
+  {
+    "question": "Who won the heavyweight title three times and was born in 1942?",
+    "ground_truth": "Muhammad Ali"
+  },
+  {
+    "question": "When was Cleopatra born?",
+    "ground_truth": "69 BC"
+  },
+  {
+    "question": "Who was the last ruler of the Ptolemaic Kingdom?",
+    "ground_truth": "Cleopatra"
+  },
+  {
+    "question": "Who did Cleopatra ally with?",
+    "ground_truth": "Julius Caesar and Mark Antony"
+  },
+  {
+    "question": "Where was Cleopatra born?",
+    "ground_truth": "Alexandria, Egypt"
+  },
+  {
+    "question": "Who was the last Ptolemaic ruler and born in 69 BC?",
+    "ground_truth": "Cleopatra"
+  },
+  {
+    "question": "What year was Alan Turing born?",
+    "ground_truth": "1912"
+  },
+  {
+    "question": "What concept did Alan Turing develop?",
+    "ground_truth": "Turing machine"
+  },
+  {
+    "question": "What code did Alan Turing help break?",
+    "ground_truth": "Enigma"
+  },
+  {
+    "question": "Where was Alan Turing born?",
+    "ground_truth": "London, England"
+  },
+  {
+    "question": "Who developed the Turing machine and was born in 1912?",
+    "ground_truth": "Alan Turing"
+  },
+  {
+    "question": "What year was Leonardo da Vinci born?",
+    "ground_truth": "1452"
+  },
+  {
+    "question": "What is Leonardo da Vinci's most famous painting?",
+    "ground_truth": "Mona Lisa"
+  },
+  {
+    "question": "What did Leonardo da Vinci design?",
+    "ground_truth": "flying machines"
+  },
+  {
+    "question": "Where was Leonardo da Vinci born?",
+    "ground_truth": "Vinci, Florence, Italy"
+  },
+  {
+    "question": "Who painted the Mona Lisa and was born in 1452?",
+    "ground_truth": "Leonardo da Vinci"
+  },
+  {
+    "question": "What is the largest river by discharge volume?",
+    "ground_truth": "Amazon River"
+  },
+  {
+    "question": "What continents does the Amazon River flow through?",
+    "ground_truth": "South America"
+  },
+  {
+    "question": "Which countries does the Amazon River flow through?",
+    "ground_truth": "Brazil and Peru"
+  },
+  {
+    "question": "How large is the Amazon basin?",
+    "ground_truth": "7 million square kilometers"
+  },
+  {
+    "question": "What is the name of the river with a 7 million sq km basin in South America?",
+    "ground_truth": "Amazon River"
+  },
+  {
+    "question": "What year was Charles Darwin born?",
+    "ground_truth": "1809"
+  },
+  {
+    "question": "What theory did Charles Darwin develop?",
+    "ground_truth": "evolution by natural selection"
+  },
+  {
+    "question": "What book did Darwin publish in 1859?",
+    "ground_truth": "On the Origin of Species"
+  },
+  {
+    "question": "Where was Charles Darwin born?",
+    "ground_truth": "Shrewsbury, England"
+  },
+  {
+    "question": "Who developed the theory of evolution and was born in 1809?",
+    "ground_truth": "Charles Darwin"
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "ground_truth": "Mars"
+  },
+  {
+    "question": "What is the tallest mountain in the solar system?",
+    "ground_truth": "Olympus Mons"
+  },
+  {
+    "question": "What are the moons of Mars called?",
+    "ground_truth": "Phobos and Deimos"
+  },
+  {
+    "question": "How many moons does Mars have?",
+    "ground_truth": "two"
+  },
+  {
+    "question": "Which planet has the mountain Olympus Mons?",
+    "ground_truth": "Mars"
+  }
+]

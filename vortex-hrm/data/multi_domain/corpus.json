@@ -1,0 +1,302 @@
+[
+  {
+    "id": "0",
+    "text": "Jane Austen was born on 16 December 1775 in Steventon, England.",
+    "entity": "Jane Austen"
+  },
+  {
+    "id": "1",
+    "text": "Jane Austen wrote 'Pride and Prejudice', first published in 1813.",
+    "entity": "Jane Austen"
+  },
+  {
+    "id": "2",
+    "text": "Jane Austen wrote 'Sense and Sensibility' and 'Emma'.",
+    "entity": "Jane Austen"
+  },
+  {
+    "id": "3",
+    "text": "George Orwell was born Eric Arthur Blair on 25 June 1903 in Motihari, India.",
+    "entity": "George Orwell"
+  },
+  {
+    "id": "4",
+    "text": "George Orwell wrote 'Nineteen Eighty-Four', published in 1949.",
+    "entity": "George Orwell"
+  },
+  {
+    "id": "5",
+    "text": "George Orwell wrote 'Animal Farm', a political satire published in 1945.",
+    "entity": "George Orwell"
+  },
+  {
+    "id": "6",
+    "text": "Marie Curie was born on 7 November 1867 in Warsaw, Poland.",
+    "entity": "Marie Curie"
+  },
+  {
+    "id": "7",
+    "text": "Marie Curie discovered the elements polonium and radium.",
+    "entity": "Marie Curie"
+  },
+  {
+    "id": "8",
+    "text": "Marie Curie won the Nobel Prize in Physics in 1903 and in Chemistry in 1911.",
+    "entity": "Marie Curie"
+  },
+  {
+    "id": "9",
+    "text": "Rosalind Franklin was born on 25 July 1920 in London, England.",
+    "entity": "Rosalind Franklin"
+  },
+  {
+    "id": "10",
+    "text": "Rosalind Franklin's X-ray crystallography images were critical to discovering DNA structure.",
+    "entity": "Rosalind Franklin"
+  },
+  {
+    "id": "11",
+    "text": "Rosalind Franklin also made contributions to the understanding of coal and viruses.",
+    "entity": "Rosalind Franklin"
+  },
+  {
+    "id": "12",
+    "text": "Ludwig van Beethoven was born on 17 December 1770 in Bonn, Germany.",
+    "entity": "Ludwig van Beethoven"
+  },
+  {
+    "id": "13",
+    "text": "Beethoven composed 9 symphonies; Symphony No. 9 is his most famous.",
+    "entity": "Ludwig van Beethoven"
+  },
+  {
+    "id": "14",
+    "text": "Beethoven began losing his hearing in his late 20s and was nearly deaf by the end of his life.",
+    "entity": "Ludwig van Beethoven"
+  },
+  {
+    "id": "15",
+    "text": "Aretha Franklin was born on 25 March 1942 in Memphis, Tennessee, USA.",
+    "entity": "Aretha Franklin"
+  },
+  {
+    "id": "16",
+    "text": "Aretha Franklin is known as the Queen of Soul and her hit song 'Respect'.",
+    "entity": "Aretha Franklin"
+  },
+  {
+    "id": "17",
+    "text": "Aretha Franklin won 18 Grammy Awards during her career.",
+    "entity": "Aretha Franklin"
+  },
+  {
+    "id": "18",
+    "text": "Muhammad Ali was born Cassius Clay on 17 January 1942 in Louisville, Kentucky, USA.",
+    "entity": "Muhammad Ali"
+  },
+  {
+    "id": "19",
+    "text": "Muhammad Ali won the world heavyweight boxing title three times.",
+    "entity": "Muhammad Ali"
+  },
+  {
+    "id": "20",
+    "text": "Muhammad Ali was known for 'float like a butterfly, sting like a bee'.",
+    "entity": "Muhammad Ali"
+  },
+  {
+    "id": "21",
+    "text": "Serena Williams was born on 26 September 1981 in Saginaw, Michigan, USA.",
+    "entity": "Serena Williams"
+  },
+  {
+    "id": "22",
+    "text": "Serena Williams won 23 Grand Slam singles titles, the most in the Open Era.",
+    "entity": "Serena Williams"
+  },
+  {
+    "id": "23",
+    "text": "Serena Williams is considered one of the greatest tennis players of all time.",
+    "entity": "Serena Williams"
+  },
+  {
+    "id": "24",
+    "text": "Cleopatra VII was born in 69 BC in Alexandria, Egypt.",
+    "entity": "Cleopatra"
+  },
+  {
+    "id": "25",
+    "text": "Cleopatra was the last active ruler of the Ptolemaic Kingdom of Egypt.",
+    "entity": "Cleopatra"
+  },
+  {
+    "id": "26",
+    "text": "Cleopatra allied with Julius Caesar and later Mark Antony of Rome.",
+    "entity": "Cleopatra"
+  },
+  {
+    "id": "27",
+    "text": "Genghis Khan was born Temujin around 1162 near the Onon River in Mongolia.",
+    "entity": "Genghis Khan"
+  },
+  {
+    "id": "28",
+    "text": "Genghis Khan founded the Mongol Empire, the largest contiguous land empire.",
+    "entity": "Genghis Khan"
+  },
+  {
+    "id": "29",
+    "text": "Genghis Khan united the nomadic Mongol tribes and established the Yassa legal code.",
+    "entity": "Genghis Khan"
+  },
+  {
+    "id": "30",
+    "text": "Alan Turing was born on 23 June 1912 in London, England.",
+    "entity": "Alan Turing"
+  },
+  {
+    "id": "31",
+    "text": "Alan Turing developed the concept of the Turing machine, a foundation of computer science.",
+    "entity": "Alan Turing"
+  },
+  {
+    "id": "32",
+    "text": "Alan Turing played a crucial role in breaking the Enigma code during World War II.",
+    "entity": "Alan Turing"
+  },
+  {
+    "id": "33",
+    "text": "Grace Hopper was born on 9 December 1906 in New York City, USA.",
+    "entity": "Grace Hopper"
+  },
+  {
+    "id": "34",
+    "text": "Grace Hopper invented the first compiler for a programming language.",
+    "entity": "Grace Hopper"
+  },
+  {
+    "id": "35",
+    "text": "Grace Hopper contributed to the COBOL programming language.",
+    "entity": "Grace Hopper"
+  },
+  {
+    "id": "36",
+    "text": "Leonardo da Vinci was born on 15 April 1452 in Vinci, Florence, Italy.",
+    "entity": "Leonardo da Vinci"
+  },
+  {
+    "id": "37",
+    "text": "Leonardo da Vinci painted the Mona Lisa, one of the most famous paintings.",
+    "entity": "Leonardo da Vinci"
+  },
+  {
+    "id": "38",
+    "text": "Leonardo da Vinci designed flying machines and studied anatomy.",
+    "entity": "Leonardo da Vinci"
+  },
+  {
+    "id": "39",
+    "text": "Frida Kahlo was born on 6 July 1907 in Coyoacan, Mexico City, Mexico.",
+    "entity": "Frida Kahlo"
+  },
+  {
+    "id": "40",
+    "text": "Frida Kahlo is known for her self-portraits exploring identity and pain.",
+    "entity": "Frida Kahlo"
+  },
+  {
+    "id": "41",
+    "text": "Frida Kahlo's house La Casa Azul is now a museum.",
+    "entity": "Frida Kahlo"
+  },
+  {
+    "id": "42",
+    "text": "The Amazon River flows through South America, mainly Brazil and Peru.",
+    "entity": "Amazon River"
+  },
+  {
+    "id": "43",
+    "text": "The Amazon River is the largest river by discharge volume in the world.",
+    "entity": "Amazon River"
+  },
+  {
+    "id": "44",
+    "text": "The Amazon basin covers about 7 million square kilometers.",
+    "entity": "Amazon River"
+  },
+  {
+    "id": "45",
+    "text": "Mount Everest is the highest mountain on Earth at 8848 meters above sea level.",
+    "entity": "Mount Everest"
+  },
+  {
+    "id": "46",
+    "text": "Mount Everest is located in the Himalayas on the border of Nepal and Tibet.",
+    "entity": "Mount Everest"
+  },
+  {
+    "id": "47",
+    "text": "Edmund Hillary and Tenzing Norgay first summited Mount Everest in 1953.",
+    "entity": "Mount Everest"
+  },
+  {
+    "id": "48",
+    "text": "Charles Darwin was born on 12 February 1809 in Shrewsbury, England.",
+    "entity": "Charles Darwin"
+  },
+  {
+    "id": "49",
+    "text": "Charles Darwin developed the theory of evolution by natural selection.",
+    "entity": "Charles Darwin"
+  },
+  {
+    "id": "50",
+    "text": "Darwin's book 'On the Origin of Species' was published in 1859.",
+    "entity": "Charles Darwin"
+  },
+  {
+    "id": "51",
+    "text": "Louis Pasteur was born on 27 December 1822 in Dole, France.",
+    "entity": "Louis Pasteur"
+  },
+  {
+    "id": "52",
+    "text": "Louis Pasteur developed pasteurization and vaccines for rabies and anthrax.",
+    "entity": "Louis Pasteur"
+  },
+  {
+    "id": "53",
+    "text": "Louis Pasteur is considered one of the founders of microbiology.",
+    "entity": "Louis Pasteur"
+  },
+  {
+    "id": "54",
+    "text": "Mars is the fourth planet from the Sun and is known as the Red Planet.",
+    "entity": "Mars"
+  },
+  {
+    "id": "55",
+    "text": "Mars has the tallest mountain in the solar system, Olympus Mons at 21.9 km.",
+    "entity": "Mars"
+  },
+  {
+    "id": "56",
+    "text": "Mars has two small moons named Phobos and Deimos.",
+    "entity": "Mars"
+  },
+  {
+    "id": "57",
+    "text": "Voyager 1 was launched by NASA on 5 September 1977.",
+    "entity": "Voyager 1"
+  },
+  {
+    "id": "58",
+    "text": "Voyager 1 is the farthest human-made object from Earth, in interstellar space.",
+    "entity": "Voyager 1"
+  },
+  {
+    "id": "59",
+    "text": "Voyager 1 carries a Golden Record with sounds and images representing Earth.",
+    "entity": "Voyager 1"
+  }
+]

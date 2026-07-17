@@ -185,3 +185,9 @@ notebooks/colab_runs/
 **Режимы запуска** (переменная `MODE` в начале ноутбука):
 - `"test"` — первые 5 вопросов из questions.json, результат в `_test/<timestamp>/`
 - `"full"` — все 50 вопросов, результат в `<timestamp>/`
+
+### 2026-07-16 — Fix: data/ in gitignore broke Colab clone
+
+`data/` в корневом `.gitignore` — при клоне репо `vortex-hrm/data/multi_domain/questions.json` и `corpus.json` не скачивались. Colab выдавал `FileNotFoundError`.
+
+**Fix:** Убрал `data/` из `.gitignore` (заменил на `results/` — результаты действительно не нужно трекать). Добавил JSON с вопросами и корпусом в Git — это маленькие файлы (202 и 302 строки), задающие бенчмарк, должны быть под версиями.
