@@ -166,12 +166,22 @@ Notebook: `notebooks/vortex_benchmark_colab.ipynb`
 **Структура runs:**
 ```
 notebooks/colab_runs/
-├── 2026-07-16_22-05-00/
+├── _test/                      ← test-прогоны (5 вопросов, ~25 мин)
+│   ├── 2026-07-16_22-05-00/
+│   │   ├── meta.json
+│   │   ├── predictions.jsonl
+│   │   ├── checkpoint.json
+│   │   └── errors.log
+│   └── ...
+├── 2026-07-17_14-30-00/        ← полные прогоны (50 вопросов, ~4.5 ч)
 │   ├── meta.json              ← параметры эксперимента
 │   ├── predictions.jsonl      ← 50 ответов (question, prediction, ground_truth, spirals, time_s)
 │   ├── checkpoint.json        ← чекпоинт для resume
 │   └── errors.log             ← ошибки
-├── 2026-07-17_14-30-00/
-│   └── ...
+├── ...
 └── .gitkeep
 ```
+
+**Режимы запуска** (переменная `MODE` в начале ноутбука):
+- `"test"` — первые 5 вопросов из questions.json, результат в `_test/<timestamp>/`
+- `"full"` — все 50 вопросов, результат в `<timestamp>/`
