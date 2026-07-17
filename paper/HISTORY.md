@@ -191,3 +191,15 @@ notebooks/colab_runs/
 `data/` в корневом `.gitignore` — при клоне репо `vortex-hrm/data/multi_domain/questions.json` и `corpus.json` не скачивались. Colab выдавал `FileNotFoundError`.
 
 **Fix:** Убрал `data/` из `.gitignore` (заменил на `results/` — результаты действительно не нужно трекать). Добавил JSON с вопросами и корпусом в Git — это маленькие файлы (202 и 302 строки), задающие бенчмарк, должны быть под версиями.
+
+### 2026-07-17 — First full run on T4 + experiment plan
+
+**Full run (VORTEX-HRM, qwen2.5:7b, T4 GPU, 50 Q):**
+- Contains: 74% (37/50), Insufficient evidence: 10% (5/50)
+- Avg spirals: 1.6, Avg time: 59 sec/q, total 49 min
+- EM: 0%, F1: 19.9%
+
+**Notebook v3 — RUN_TYPE:**
+- `RUN_TYPE = "vortex"` / `"baseline"` — выбор эксперимента
+- `baseline_rag.py` — Naive RAG (один retrieve + LLM, без вихря)
+- Badge fix, GPU check при full mode
