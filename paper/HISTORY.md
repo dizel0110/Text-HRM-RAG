@@ -214,6 +214,25 @@ notebooks/colab_runs/
 
 **Fix:** Чекпоинты VORTEX и baseline теперь хранятся раздельно на Google Drive. Каждый `RUN_TYPE` — своя папка.
 
+### 2026-07-17 — Baseline run + comparison
+
+**Baseline (Naive RAG, qwen2.5:7b, 50 Q):**
+- Contains: 68% (34/50), No evidence: 24% (12/50)
+- EM: 20%, F1: 40%
+- Avg time: 3 sec/q, Avg answer len: 48 chars
+
+**Сравнение: VORTEX vs Baseline**
+| Метрика | VORTEX | Baseline | Вывод |
+|---------|--------|----------|-------|
+| Contains | **74%** | 68% | VORTEX +6% |
+| No evidence | **10%** | 24% | VORTEX находит на 14% больше ответов |
+| EM | 0% | **20%** | Baseline отвечает короче |
+| F1 | 19.9% | **40%** | Baseline точнее по словам |
+| Avg time | 59s | **3s** | Baseline в 20× быстрее |
+| Avg len | 200+ chars | 48 chars | VORTEX даёт контекст |
+
+**Главный вывод для статьи:** VORTEX превосходит Naive RAG по полноте ответов (Contains +6%, No evidence -14%) за счёт многошагового поиска. Baseline отвечает быстрее и короче, но чаще не находит нужную информацию (24% vs 10%).
+
 **Notebook v3 — RUN_TYPE:**
 - `RUN_TYPE = "vortex"` / `"baseline"` — выбор эксперимента
 - `baseline_rag.py` — Naive RAG (один retrieve + LLM, без вихря)
