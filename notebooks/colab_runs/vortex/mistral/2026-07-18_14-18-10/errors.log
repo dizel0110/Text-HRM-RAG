@@ -1,0 +1,6 @@
+[0] What year was Jane Austen born?: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)
+[16] What was Muhammad Ali's birth name?: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)
+[29] Who developed the Turing machine and was born in 1912?: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)
+[36] What continents does the Amazon River flow through?: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)
+[37] Which countries does the Amazon River flow through?: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)
+[45] Which planet is known as the Red Planet?: HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=120)
