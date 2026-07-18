@@ -1,0 +1,13 @@
+{
+  "mode": "full",
+  "run_id": "2026-07-18_14-27-33",
+  "config": "colab-gpu.yaml",
+  "model": "mistral",
+  "num_questions": 50,
+  "questions": "/content/Text-HRM-RAG/vortex-hrm/data/multi_domain/questions.json",
+  "corpus": "data/multi_domain/corpus.json",
+  "engine": "NaiveRAG",
+  "run_type": "baseline",
+  "ablation_spirals": null,
+  "colab_gpu": "T4"
+}
