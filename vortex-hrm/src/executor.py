@@ -9,33 +9,29 @@ from typing import Optional
 
 import numpy as np
 
-CENTRIFUGAL_PROMPT = """You are the Centrifugal Ingestion layer of a VORTEX retrieval engine.
-Your job is to extract condensed, isolated facts from retrieved text.
+CENTRIFUGAL_PROMPT = """You extract facts from retrieved text.
 
-[Context]
-Below is the raw text retrieved from the corpus for the current sub-question.
-Your ONLY job is to condense it into structured <fact> entries.
+Given a sub-question and a retrieved passage, extract relevant evidence as a <fact>.
 
-[Output Contract]
-If the retrieved text contains relevant evidence:
+If relevant evidence exists:
 <fact source="chunk_X">
-The specific fact extracted (1-2 sentences, no fluff).
+The specific fact (1-2 sentences).
 </fact>
 
-If the retrieved text does NOT contain relevant evidence:
+If NO relevant evidence:
 <fact source="none">
-No evidence found for this sub-question.
+No evidence found.
 </fact>
 
-If the evidence is only partial and more search is needed:
+If evidence is partial and needs refinement:
 <step>
-Refined sub-query for the next retrieval round.
+Refined sub-query for better retrieval.
 </step>
 
 Rules:
-- Condense: extract only what is needed, not full paragraphs.
-- Do NOT inject knowledge from training data — only from the provided context.
-- Each <fact> must be self-contained and cite its source chunk."""
+- Extract only what is needed, not full paragraphs.
+- Do NOT use your own knowledge — only the provided text.
+- Each <fact> must cite its source chunk."""
 
 
 @dataclass
