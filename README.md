@@ -40,6 +40,30 @@ See [`vortex-hrm/README.md`](vortex-hrm/README.md) for full documentation.
 | Colab (full) | T4 GPU, 12h session | qwen2.5:7b via Ollama | `configs/colab-gpu.yaml` |
 | Cluster | GPU ≥ 8 GB VRAM | GPT-4o-mini | `configs/gpu.yaml` |
 
+## Paper
+
+This project has an associated paper accepted at Smiles-2026 / SSPP (Zapiski POMI).
+
+- 📄 [`sspp-paper.pdf`](sspp-paper.pdf) — latest version
+
+### Version history
+
+Paper versions are tagged in git. Switch between them on GitHub via the tag dropdown, or directly compare:
+
+```
+# Compare any two versions on GitHub:
+https://github.com/dizel0110/Text-HRM-RAG/compare/v1.0-sspp...v1.1-sspp
+
+# List all tags:
+git tag -l "v*"
+```
+
+| Tag | Date | Summary |
+|-----|------|---------|
+| [`v1.0-sspp`](https://github.com/dizel0110/Text-HRM-RAG/releases/tag/v1.0-sspp) | Jul 2026 | Initial SSPP submission. VORTEX 74% vs baseline 68% (+6%) on qwen2.5:7b. Ablation (spirals 1→5→15). 3 LLMs tested (qwen2.5, llama3.1, mistral). LLM sensitivity discussed. |
+
+Future tags will follow the `v<major>.<minor>-sspp` scheme.
+
 ## References
 
 - A-RAG paper: [arXiv:2602.03442](https://arxiv.org/abs/2602.03442)
