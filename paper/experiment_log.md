@@ -59,10 +59,15 @@
 
 ---
 
-## Tag: in-progress (post v1.0-sspp)
+## Tag: v1.2-sspp (in-progress)
 
-### Run 10 — VORTEX + llama3.1:8b (simplified prompts)
-- **Hypothesis:** Sci-fi wording confuses chat-optimized models → plain English fixes it
-- **Prompt change:** Removed "Fact-Free Hierarchical Reasoning Axis", "Centrifugal Ingestion layer", "static synapses" → "You are a QA planner", "You extract facts from text"
-- **Expectation:** If hypothesis correct → 62% → ~70-74%
-- **Status:** PENDING (queued for Colab)
+### Run 11 — Cross-model Router: fast=llama3.1:8b, slow=qwen2.5:7b VORTEX
+- **Date:** pending (Colab)
+- **Hypothesis:** llama3.1 has stronger direct answers (72% baseline) but qwen2.5 excels at VORTEX spirals (74%) → combining via "Insufficient evidence." gate → >82%
+- **Config:** `FAST_MODEL=llama3.1:8b`, `SLOW_MODEL=qwen2.5:7b`, `RUN_TYPE=router`
+- **Expected range:** 82–88% (depends on llama3.1's fallback triggering reliability)
+- **Status:** PENDING (ready for Colab)
+
+### Run 12 (optional) — VORTEX + llama3.1:8b (simplified prompts)
+- **Conditional:** If cross-model router succeeds, skip this. Otherwise, try plain-English prompts.
+- **Status:** BACKUP

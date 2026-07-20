@@ -88,10 +88,14 @@ def main():
     parser.add_argument("--questions", required=True)
     parser.add_argument("--corpus", required=True)
     parser.add_argument("--output", default="results")
+    parser.add_argument("--fast-model", help="Model for fast path (default: config model)")
+    parser.add_argument("--slow-model", help="Model for slow path / VORTEX (default: config model)")
     args = parser.parse_args()
 
     cfg = VORTEXConfig.from_yaml(args.config)
     backend = backend_from_config(cfg.llm)
+    fast_model = args.fast_model or cfg.llm.model
+    slow_model = args.slow_model or cfg.llm.model
 
     chunks = load_corpus(args.corpus)
     questions, ground_truths = load_questions(args.questions)
@@ -100,12 +104,12 @@ def main():
     # Shared search tool (fast path)
     kws = KeywordSearchTool(chunks)
 
-    # VORTEX engine (slow path)
+    # VORTEX engine (slow path) — uses slow_model
     ss = SemanticSearchTool(chunks, np.zeros((len(chunks), 1)))
     cr = ChunkReadTool(chunks)
     planner = GravitationalCore(
         llm_client=backend,
-        model=cfg.llm.model,
+        model=slow_model,
         temperature=cfg.llm.temperature,
         max_tokens=cfg.llm.max_tokens or 2048,
         confidence_threshold=cfg.engine.confidence_threshold,
@@ -115,7 +119,7 @@ def main():
         keyword_search=kws,
         semantic_search=ss,
         chunk_read=cr,
-        model=cfg.llm.model,
+        model=slow_model,
         temperature=cfg.llm.temperature,
     )
     vortex = VortexEngine(
@@ -134,7 +138,9 @@ def main():
     total_slow_time = 0.0
     max_tokens = cfg.llm.max_tokens or 2048
 
-    print(f"Fast/Slow Router — model={cfg.llm.model}")
+    print(f"Fast/Slow Router")
+    print(f"  Fast model: {fast_model}")
+    print(f"  Slow model: {slow_model}")
     print(f"  Questions: {len(questions)} total, {len(completed)} already done")
     print(f"  Corpus: {len(chunks)} chunks")
     print(f"  Output: {args.output}\n")
@@ -150,10 +156,10 @@ def main():
             answer = ""
             route = "error"
 
-            # Fast path
+            # Fast path — uses fast_model
             try:
                 answer, fast_time = fast_answer(
-                    question, kws, backend, cfg.llm.model,
+                    question, kws, backend, fast_model,
                     cfg.llm.temperature, max_tokens,
                 )
                 if "Insufficient evidence." in answer:
