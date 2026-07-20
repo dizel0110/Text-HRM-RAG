@@ -3,7 +3,7 @@ Fast/Slow Router for VORTEX-HRM.
 
 Strategy:
   1. Fast path (baseline): retrieve top-3 chunks + LLM answer
-     - If "Insufficient evidence." or low confidence → fallback to VORTEX
+     - If "Insufficient evidence." → fallback to VORTEX
      - Otherwise → return fast answer
   2. Slow path (VORTEX): full spiral engine (only for uncertain questions)
 """
@@ -58,36 +58,17 @@ def load_corpus(path: str) -> list:
 
 def build_fast_prompt(context: str, question: str) -> str:
     return (
-        "Answer the question using only the provided passages. "
-        'If the answer is not in the passages, say "Insufficient evidence." '
-        "Then rate your confidence (0.0-1.0) on a new line: CONFIDENCE: <score>\n\n"
+        "Answer the question using only the provided passages.\n"
+        'If the answer is not in the passages, say "Insufficient evidence."\n\n'
         "Passages:\n{context}\n\n"
         "Question: {question}\nAnswer:"
     ).format(context=context, question=question)
 
 
-def parse_fast_response(text: str) -> tuple[str, float]:
-    answer = text.strip()
-    confidence = 1.0
-    lines = answer.split("\n")
-    cleaned = []
-    for line in lines:
-        if line.strip().startswith("CONFIDENCE:"):
-            try:
-                confidence = float(line.split(":", 1)[1].strip())
-            except (ValueError, IndexError):
-                confidence = 1.0
-        else:
-            cleaned.append(line)
-    return "\n".join(cleaned).strip(), confidence
-
-
-def fast_answer(question: str, kws: KeywordSearchTool, cr: ChunkReadTool,
-                backend, model: str, temperature: float, max_tokens: int) -> tuple[str, float, float]:
-    candidates = kws.search(question, top_k=3)
-    context_parts = [cr.read(c.chunk_id, adjacent=True) for c in candidates if c]
-    context = "\n---\n".join([c for c in context_parts if c])
-
+def fast_answer(question: str, kws: KeywordSearchTool,
+                backend, model: str, temperature: float, max_tokens: int) -> tuple[str, float]:
+    top_k = kws(question, top_k=3)
+    context = "\n---\n".join(f"[{c.chunk_id}] {c.text}" for c, _ in top_k)
     prompt = build_fast_prompt(context, question)
     start = time.time()
     response = backend.chat_completion(
@@ -98,7 +79,7 @@ def fast_answer(question: str, kws: KeywordSearchTool, cr: ChunkReadTool,
     )
     elapsed = time.time() - start
     text = response.get("choices", [{}])[0].get("message", {}).get("content", "")
-    return parse_fast_response(text) + (elapsed,)
+    return text.strip(), elapsed
 
 
 def main():
@@ -107,7 +88,6 @@ def main():
     parser.add_argument("--questions", required=True)
     parser.add_argument("--corpus", required=True)
     parser.add_argument("--output", default="results")
-    parser.add_argument("--confidence-threshold", type=float, default=0.8)
     args = parser.parse_args()
 
     cfg = VORTEXConfig.from_yaml(args.config)
@@ -117,12 +97,12 @@ def main():
     questions, ground_truths = load_questions(args.questions)
     completed = load_checkpoint(args.output)
 
-    # Shared search tools (fast path)
+    # Shared search tool (fast path)
     kws = KeywordSearchTool(chunks)
-    cr = ChunkReadTool(chunks)
 
     # VORTEX engine (slow path)
     ss = SemanticSearchTool(chunks, np.zeros((len(chunks), 1)))
+    cr = ChunkReadTool(chunks)
     planner = GravitationalCore(
         llm_client=backend,
         model=cfg.llm.model,
@@ -154,7 +134,7 @@ def main():
     total_slow_time = 0.0
     max_tokens = cfg.llm.max_tokens or 2048
 
-    print(f"Fast/Slow Router — model={cfg.llm.model}, threshold={args.confidence_threshold}")
+    print(f"Fast/Slow Router — model={cfg.llm.model}")
     print(f"  Questions: {len(questions)} total, {len(completed)} already done")
     print(f"  Corpus: {len(chunks)} chunks")
     print(f"  Output: {args.output}\n")
@@ -172,11 +152,11 @@ def main():
 
             # Fast path
             try:
-                answer, confidence, fast_time = fast_answer(
-                    question, kws, cr, backend, cfg.llm.model,
+                answer, fast_time = fast_answer(
+                    question, kws, backend, cfg.llm.model,
                     cfg.llm.temperature, max_tokens,
                 )
-                if "Insufficient evidence." in answer or confidence < args.confidence_threshold:
+                if "Insufficient evidence." in answer:
                     route = "slow"
                     slow_start = time.time()
                     answer = vortex.run(question)
