@@ -53,6 +53,7 @@ Paper versions are tagged in git. Switch between them on GitHub via the tag drop
 ```
 # Compare any two versions on GitHub:
 https://github.com/dizel0110/Text-HRM-RAG/compare/v1.0-sspp...v1.1-sspp
+https://github.com/dizel0110/Text-HRM-RAG/compare/v1.1-sspp...main
 
 # List all tags:
 git tag -l "v*"
