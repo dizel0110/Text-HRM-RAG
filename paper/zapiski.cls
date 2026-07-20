@@ -279,11 +279,11 @@
 
 %    Определяем логотип
 \def\publnamef{%
-  \hbox{Записки научных}}
+  \hbox{Zapiski nauchnykh}}
 \def\publnames{%
-  \hbox{семинаров ПОМИ}}
+  \hbox{seminarov POMI}}
 \def\russianvolinfo{%
-  \hbox{Том \origvolume, \origyear\ г.}}
+  \hbox{Vol.~\origvolume, \origyear}}
 \AtBeginDocument{%
   \def\@serieslogo{%
     \vbox to\headheight{%
