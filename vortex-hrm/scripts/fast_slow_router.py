@@ -25,7 +25,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from core.config import VORTEXConfig
 from core.llm import backend_from_config
-from executor import KeywordSearchTool, ChunkReadTool, Chunk
+import numpy as np
+from executor import KeywordSearchTool, SemanticSearchTool, ChunkReadTool, Chunk
 from orchestrator import VortexEngine
 from planner import GravitationalCore
 from executor import CentrifugalIngestor
@@ -108,25 +109,28 @@ def main():
     _, questions, ground_truths = load_data(args.questions)
 
     # Init VORTEX engine (slow path)
+    kws = KeywordSearchTool(chunks)
+    ss = SemanticSearchTool(chunks, np.zeros((len(chunks), 1)))
+    cr = ChunkReadTool(chunks)
     planner = GravitationalCore(
         llm_client=backend,
         model=cfg.llm.model,
         temperature=cfg.llm.temperature,
         max_tokens=cfg.llm.max_tokens or 2048,
         confidence_threshold=cfg.engine.confidence_threshold,
-        entropy_stall_limit=cfg.engine.entropy_stall_limit,
     )
     executor = CentrifugalIngestor(
         llm_client=backend,
+        keyword_search=kws,
+        semantic_search=ss,
+        chunk_read=cr,
         model=cfg.llm.model,
         temperature=cfg.llm.temperature,
-        chunks=chunks,
     )
     vortex = VortexEngine(
         planner=planner,
         executor=executor,
         max_spirals=cfg.engine.max_spirals,
-        context_budget=cfg.engine.context_budget,
     )
 
     os.makedirs(args.output, exist_ok=True)
