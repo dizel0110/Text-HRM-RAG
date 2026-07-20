@@ -61,6 +61,7 @@ git tag -l "v*"
 | Tag | Date | Summary |
 |-----|------|---------|
 | [`v1.0-sspp`](https://github.com/dizel0110/Text-HRM-RAG/releases/tag/v1.0-sspp) | Jul 2026 | Initial SSPP submission. VORTEX 74% vs baseline 68% (+6%) on qwen2.5:7b. Ablation (spirals 1→5→15). 3 LLMs tested (qwen2.5, llama3.1, mistral). LLM sensitivity discussed. |
+| [`v1.1-sspp`](https://github.com/dizel0110/Text-HRM-RAG/releases/tag/v1.1-sspp) | Jul 2026 | **Fast/Slow Router** — dynamic gate between Naive RAG and VORTEX. 82% Contains on qwen2.5:7b (+14% vs baseline, +8% vs VORTEX alone). Uncertainty signal (``Insufficient evidence.'') as zero-training fallback trigger. Single-model router, 5× faster than VORTEX. Cross-model routing deferred to future work. |
 
 Future tags will follow the `v<major>.<minor>-sspp` scheme.
 
