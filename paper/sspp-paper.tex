@@ -121,7 +121,7 @@ Model & Baseline & VORTEX & Router & $\Delta$ (Router vs Base) \\
 \label{fig:comparison}
 \end{figure}
 
-VORTEX achieves its best result on \texttt{qwen2.5:7b}: 74\% vs 68\% baseline ($+6\%$). The improvement comes from evidence chaining---VORTEX iteratively retrieves and verifies facts across multiple spirals, while baseline answers from a fixed set of top-3 chunks.
+VORTEX achieves its best result on \texttt{qwen2.5:7b}: 74\% vs 68\% baseline ($+6\%$, Fig.~\ref{fig:comparison}). The improvement comes from evidence chaining---VORTEX iteratively retrieves and verifies facts across multiple spirals, while baseline answers from a fixed set of top-3 chunks.
 
 Crucially, VORTEX reduces hallucination: the no-evidence rate drops from 24\% (baseline) to 10\% (VORTEX) on \texttt{qwen2.5:7b}, a 2.4$\times$ improvement. However, on \texttt{llama3.1:8b} and \texttt{mistral}, VORTEX {\it underperforms} baseline. This indicates that VORTEX's spiral architecture requires a minimum LLM reasoning capability---strong models (72\% baseline) or weak models (68\%) both degrade when forced into iterative re-planning.
 
@@ -150,7 +150,7 @@ Max spirals & Contains \\
 \label{tab:ablation}
 \end{table}
 
-Single-pass (no spirals) yields 60\%. Adding 5 spirals boosts accuracy to 74\%---a +14\% gain. Beyond 5, accuracy plateaus: 10 spirals gives 70\% (within noise) and 15 gives 74\%. This confirms that the spiral mechanism is the primary driver of VORTEX's improvement, and a small depth (5 spirals) is sufficient for convergence on this benchmark.
+Single-pass (no spirals) yields 60\% (Fig.~\ref{fig:ablation}, Table~\ref{tab:ablation}). Adding 5 spirals boosts accuracy to 74\%---a +14\% gain. Beyond 5, accuracy plateaus: 10 spirals gives 70\% (within noise) and 15 gives 74\%. This confirms that the spiral mechanism is the primary driver of VORTEX's improvement, and a small depth (5 spirals) is sufficient for convergence on this benchmark.
 
 \subsection{LLM Sensitivity}
 \label{sec:llm-sens}
