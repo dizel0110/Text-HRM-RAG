@@ -62,11 +62,15 @@
 ## Tag: v1.2-sspp (in-progress)
 
 ### Run 11 — Cross-model Router: fast=llama3.1:8b, slow=qwen2.5:7b VORTEX
-- **Date:** pending (Colab)
-- **Hypothesis:** llama3.1 has stronger direct answers (72% baseline) but qwen2.5 excels at VORTEX spirals (74%) → combining via "Insufficient evidence." gate → >82%
+- **Date:** 2026-07-21
+- **Hardware:** T4 GPU (Colab)
 - **Config:** `FAST_MODEL=llama3.1:8b`, `SLOW_MODEL=qwen2.5:7b`, `RUN_TYPE=router`
-- **Expected range:** 82–88% (depends on llama3.1's fallback triggering reliability)
-- **Status:** PENDING (ready for Colab)
+- **Results:** Contains 84% (42/50), EM 38% (19/50), F1 58.5%
+- **Fast path:** 41/50 (82%), 38/41 = 93% accuracy
+- **Slow path:** 9/50 (18%), 4/9 = 44% saved
+- **Total time:** 9.8 min (11.8 s avg)
+- **Δ vs same-model router (+2%), vs fast baseline (+12%), vs VORTEX (+10%)
+- **Status:** COMPLETED (best result on benchmark)
 
 ### Run 12 (optional) — VORTEX + llama3.1:8b (simplified prompts)
 - **Conditional:** If cross-model router succeeds, skip this. Otherwise, try plain-English prompts.

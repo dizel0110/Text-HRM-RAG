@@ -108,9 +108,10 @@ Model & Baseline & VORTEX & Router & $\Delta$ (Router vs Base) \\
 \texttt{qwen2.5:7b} & 68\% & 74\% & \textbf{82\%} & $+14\%$ \\
 \texttt{llama3.1:8b} & 72\% & 62\% & --- & --- \\
 \texttt{mistral} (7B) & 68\% & 56\% & --- & --- \\
+Cross-model$^\dag$ & 72\% & --- & \textbf{84\%} & $+12\%$ \\
 \bottomrule
 \end{tabular}
-\caption{VORTEX vs Naive RAG vs Router (Contains, 50 QA). Router applies to \texttt{qwen2.5:7b} only.}
+\caption{VORTEX vs Naive RAG vs Router (Contains, 50 QA). Same-model Router uses \texttt{qwen2.5:7b}; $^\dag$Cross-model Router uses \texttt{llama3.1:8b} (fast) and \texttt{qwen2.5:7b} VORTEX (slow).}
 \label{tab:main}
 \end{table}
 
@@ -190,16 +191,22 @@ The router achieves 82\%---a $+14\%$ improvement over Naive RAG and $+8\%$ over 
 
 Limitations: four questions (8\%) received confident but incorrect answers from the fast path (baseline hallucination), and five slow-path questions (10\%) remained unsolved by VORTEX. These together account for the remaining 18\% error rate.
 
+\subsection{Cross-Model Router}
+
+The same-model router uses one LLM for both paths. However, \texttt{llama3.1:8b} has the strongest direct answer (72\% baseline) while \texttt{qwen2.5:7b} excels at VORTEX spirals (74\%), suggesting a cross-model architecture: fast path with \texttt{llama3.1:8b} (stronger System 1) and slow path with \texttt{qwen2.5:7b} VORTEX (stronger System 2).
+
+We evaluate this on the same 50-question benchmark. The fast path handles 41/50 questions (82\%) at 93\% accuracy; the slow path recovers 4 of 9 fallbacks (44\%). Overall: \textbf{84\%} (42/50)---a $+12\%$ gain over the fast-model baseline and $+2\%$ over the same-model router. Total time: 9.8 min (11.8 s avg). This is the best result on our benchmark.
+
 \section{Conclusion}
 \label{sec:conclusion}
 
 VORTEX demonstrates that a fact-free planner with fixed chained retrieval and entropic collapse is a viable architecture for multi-hop QA. On \texttt{qwen2.5:7b}, VORTEX achieves 74\% Contains (+6\% over Naive RAG) with 2.4$\times$ fewer hallucinations. Ablation confirms that the spiral mechanism is responsible for these gains, with 5 spirals sufficient for convergence.
 
-The Fast/Slow Router extends this to 82\% by gating between direct answer and spiral retrieval using the LLM's own uncertainty signal. This zero-training approach achieves competitive gains without the complexity of trained reflection or separate classifiers. The router also reduces average latency 5$\times$ compared to running VORTEX on every question.
+The Fast/Slow Router extends this to 82\% (same-model) and 84\% (cross-model) by gating between direct answer and spiral retrieval using the LLM's own uncertainty signal. Cross-model routing---fast path with \texttt{llama3.1:8b}, slow path with \texttt{qwen2.5:7b} VORTEX---is the best-performing configuration on our benchmark. This zero-training approach achieves competitive gains without the complexity of trained reflection or separate classifiers. The router also reduces average latency 5$\times$ compared to running VORTEX on every question.
 
 The system is offline-first, config-driven, and scales from laptop to cluster without code changes. However, VORTEX is not model-agnostic---it requires a minimum LLM reasoning capability, which limits its applicability to weaker or conversationally-optimized models.
 
-Future work will explore cross-model routing (e.g., fast path with \texttt{llama3.1:8b} at 72\% baseline, slow path with \texttt{qwen2.5:7b} VORTEX) to combine the strengths of different LLMs, integration of semantic search via FAISS, and scaling evaluation to HotpotQA~\cite{yang2018hotpotqa} and other established benchmarks.
+Future work will explore additional model combinations (e.g., larger LLMs, open-weight models), integration of semantic search via FAISS, and scaling evaluation to HotpotQA~\cite{yang2018hotpotqa} and other established benchmarks.
 
 \section*{Acknowledgments}
 
