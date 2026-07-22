@@ -1,0 +1,17 @@
+{
+  "mode": "full",
+  "run_id": "2026-07-22_15-23-23",
+  "config": "colab-gpu.yaml",
+  "model": "deepseek-r1:7b",
+  "fast_model": null,
+  "slow_model": null,
+  "num_questions": 50,
+  "questions": "/content/Text-HRM-RAG/vortex-hrm/data/multi_domain/questions.json",
+  "corpus": "data/multi_domain/corpus.json",
+  "engine": "NaiveRAG",
+  "run_type": "baseline",
+  "ablation_spirals": null,
+  "colab_gpu": "T4",
+  "total_time_s": 591.5,
+  "total_time_min": 9.9
+}
