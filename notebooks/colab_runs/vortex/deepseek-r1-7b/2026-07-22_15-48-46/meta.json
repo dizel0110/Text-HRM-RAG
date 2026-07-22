@@ -1,0 +1,17 @@
+{
+  "mode": "full",
+  "run_id": "2026-07-22_15-48-46",
+  "config": "colab-gpu.yaml",
+  "model": "deepseek-r1:7b",
+  "fast_model": null,
+  "slow_model": null,
+  "num_questions": 50,
+  "questions": "/content/Text-HRM-RAG/vortex-hrm/data/multi_domain/questions.json",
+  "corpus": "data/multi_domain/corpus.json",
+  "engine": "VortexEngine",
+  "run_type": "vortex",
+  "ablation_spirals": null,
+  "colab_gpu": "T4",
+  "total_time_s": 1262.3,
+  "total_time_min": 21.0
+}
