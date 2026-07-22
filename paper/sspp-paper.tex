@@ -213,7 +213,7 @@ The Fast/Slow Router extends this to 82\% (same-model) and 84\% (cross-model) by
 
 The system is offline-first, config-driven, and scales from laptop to cluster without code changes. However, VORTEX is not model-agnostic---it requires models optimized for structured instruction following rather than chain-of-thought reasoning, which limits its applicability to certain LLM families.
 
-Future work will explore prompt adaptation for reasoning-optimized models, integration of semantic search via FAISS, and scaling evaluation to HotpotQA~\cite{yang2018hotpotqa} and other established benchmarks.
+Several directions emerge from these findings. First, the XML protocol may be the primary barrier for reasoning-optimized models: \texttt{DeepSeek-R1} achieves 76\% baseline (best) but 57\% VORTEX (worst), yet it shares the same base architecture (\texttt{Qwen2.5-7B}) as our best VORTEX model (74\%). If prompt adaptation---replacing XML tags with natural-language instructions---closes this gap, VORTEX becomes model-agnostic, which is the central open question. Second, the router's confidence gate (``Insufficient evidence'' string match) is a heuristic; explicit confidence prompting or temperature-based uncertainty estimation could push accuracy above 85\%. Third, domain-level analysis may reveal where spirals help most---multi-hop questions requiring evidence chaining should benefit more than single-hop lookups. Finally, scaling to HotpotQA~\cite{yang2018hotpotqa} would validate generalizability beyond our 50-question benchmark.
 
 \section*{Acknowledgments}
 
