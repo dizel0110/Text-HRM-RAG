@@ -33,6 +33,29 @@ Rules:
 - Do NOT use your own knowledge — only the provided text.
 - Each <fact> must cite its source chunk."""
 
+CENTRIFUGAL_PROMPT_PLAIN = """You extract facts from retrieved text.
+
+Given a sub-question and a retrieved passage, extract relevant evidence.
+
+If relevant evidence exists:
+FACT from chunk_X: The specific fact (1-2 sentences).
+
+If NO relevant evidence:
+FACT from none: No evidence found.
+
+If evidence is partial and needs refinement:
+REFINE: Refined sub-query for better retrieval.
+
+Examples:
+- FACT from chunk_3: The Silent Sea won the Booker Prize in 2010.
+- FACT from none: No evidence found in the provided text.
+- REFINE: What awards did The Silent Sea receive?
+
+Rules:
+- Extract only what is needed, not full paragraphs.
+- Do NOT use your own knowledge — only the provided text.
+- Each FACT must cite its source chunk."""
+
 
 @dataclass
 class Fact:
@@ -68,13 +91,21 @@ class IngestionResult:
     step_to_resolve: int = 0
 
     @classmethod
-    def parse(cls, text: str) -> "IngestionResult":
+    def parse(cls, text: str, use_xml: bool = True) -> "IngestionResult":
         facts = []
-        for match in re.finditer(r'<fact\s+source="([^"]*)">(.*?)</fact>', text, re.DOTALL):
-            facts.append(Fact(source=match.group(1), text=match.group(2).strip()))
 
-        step_match = re.search(r"<step>(.*?)</step>", text, re.DOTALL)
-        remaining_step = step_match.group(1).strip() if step_match else None
+        if use_xml:
+            for match in re.finditer(r'<fact\s+source="([^"]*)">(.*?)</fact>', text, re.DOTALL):
+                facts.append(Fact(source=match.group(1), text=match.group(2).strip()))
+
+            step_match = re.search(r"<step>(.*?)</step>", text, re.DOTALL)
+            remaining_step = step_match.group(1).strip() if step_match else None
+        else:
+            for match in re.finditer(r'FACT from ([^:]*):\s*(.*?)(?:\n|$)', text, re.DOTALL):
+                facts.append(Fact(source=match.group(1).strip(), text=match.group(2).strip()))
+
+            step_match = re.search(r"REFINE:\s*(.*?)(?:\n|$)", text, re.DOTALL)
+            remaining_step = step_match.group(1).strip() if step_match else None
 
         return cls(facts=facts, remaining_step=remaining_step)
 
@@ -156,6 +187,7 @@ class CentrifugalIngestor:
         max_loops: int = 10,
         temperature: float = 0.0,
         top_k_retrieve: int = 3,
+        use_xml: bool = True,
     ):
         self.llm_client = llm_client
         self.keyword_search = keyword_search
@@ -165,6 +197,7 @@ class CentrifugalIngestor:
         self.max_loops = max_loops
         self.temperature = temperature
         self.top_k_retrieve = top_k_retrieve
+        self.use_xml = use_xml
 
     def _auto_retrieve(self, query: str) -> str:
         results = self.keyword_search(query, top_k=self.top_k_retrieve)
@@ -189,9 +222,12 @@ class CentrifugalIngestor:
         if not retrieved:
             return IngestionResult(facts=[Fact(source="none", text="No evidence found in corpus for this sub-question.")])
 
+        prompt = CENTRIFUGAL_PROMPT if self.use_xml else CENTRIFUGAL_PROMPT_PLAIN
+        fact_hint = "<fact> entries" if self.use_xml else "FACT entries"
+
         messages = [
-            {"role": "system", "content": CENTRIFUGAL_PROMPT},
-            {"role": "user", "content": f"Sub-question: {sub_question}\n\nRetrieved text:\n{retrieved}\n\nCondense the relevant evidence into <fact> entries."},
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": f"Sub-question: {sub_question}\n\nRetrieved text:\n{retrieved}\n\nCondense the relevant evidence into {fact_hint}."},
         ]
 
         for turn in range(self.max_loops):
@@ -205,7 +241,7 @@ class CentrifugalIngestor:
             content = response["choices"][0]["message"]["content"]
             messages.append({"role": "assistant", "content": content})
 
-            result = IngestionResult.parse(content)
+            result = IngestionResult.parse(content, use_xml=self.use_xml)
             if result.facts:
                 return result
 

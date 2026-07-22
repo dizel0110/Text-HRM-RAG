@@ -37,6 +37,41 @@ Rules:
 - Base answers only on facts from spiral_memory.
 - If spiral_memory is empty, emit a <step> — never a final_answer first."""
 
+GRAVITATIONAL_CORE_PROMPT_PLAIN = """You are a QA planner. Your job is to decompose multi-hop questions and manage evidence retrieval.
+
+CRITICAL RULES:
+- Do NOT answer the question directly. Only use facts from spiral_memory.
+- If no facts are available, ask a sub-question to retrieve more data.
+- Do NOT guess. Every claim must cite a fact from spiral_memory.
+
+Your state:
+- question: the original question
+- spiral_memory: facts found so far (from executor)
+- remaining_steps: sub-questions not yet answered
+- hop_count: steps taken so far
+
+Output exactly ONE of these three actions:
+
+1. RETRIEVE: Ask a sub-question to retrieve more evidence.
+   Format: RETRIEVE: [your sub-question here]
+
+2. STOP: You have enough evidence to answer.
+   Format: STOP: [reason why no more retrieval is needed]
+
+3. ANSWER: All sub-questions answered, provide final answer.
+   Format: ANSWER: [short answer only, no explanation]
+
+Examples:
+- RETRIEVE: Who was the first president of the United States?
+- STOP: I have found all required facts from spiral_memory.
+- ANSWER: George Washington
+
+Rules:
+- Each RETRIEVE must ask for one fact only.
+- Never repeat a resolved step.
+- Base answers only on facts from spiral_memory.
+- If spiral_memory is empty, emit a RETRIEVE — never an ANSWER first."""
+
 
 def token_fingerprint(text: str) -> set[str]:
     return set(text.lower().split())
@@ -177,20 +212,32 @@ class SpinOutput:
     entropic_collapse: bool = False
 
     @classmethod
-    def parse(cls, text: str) -> "SpinOutput":
+    def parse(cls, text: str, use_xml: bool = True) -> "SpinOutput":
         think_match = re.search(r"<think>(.*?)</think>", text, re.DOTALL)
         reasoning = think_match.group(1).strip() if think_match else ""
 
-        step_match = re.search(r"<step>(.*?)</step>", text, re.DOTALL)
-        stop_match = re.search(r"<stop_search>(.*?)</stop_search>", text, re.DOTALL)
-        final_match = re.search(r"<final_answer>(.*?)</final_answer>", text, re.DOTALL)
+        if use_xml:
+            step_match = re.search(r"<step>(.*?)</step>", text, re.DOTALL)
+            stop_match = re.search(r"<stop_search>(.*?)</stop_search>", text, re.DOTALL)
+            final_match = re.search(r"<final_answer>(.*?)</final_answer>", text, re.DOTALL)
 
-        return cls(
-            reasoning=reasoning,
-            step=step_match.group(1).strip() if step_match else None,
-            stop_search=stop_match.group(1).strip() if stop_match else None,
-            final_answer=final_match.group(1).strip() if final_match else None,
-        )
+            return cls(
+                reasoning=reasoning,
+                step=step_match.group(1).strip() if step_match else None,
+                stop_search=stop_match.group(1).strip() if stop_match else None,
+                final_answer=final_match.group(1).strip() if final_match else None,
+            )
+        else:
+            retrieve_match = re.search(r"RETRIEVE:\s*(.*?)(?:\n|$)", text, re.DOTALL)
+            stop_match = re.search(r"STOP:\s*(.*?)(?:\n|$)", text, re.DOTALL)
+            answer_match = re.search(r"ANSWER:\s*(.*?)(?:\n|$)", text, re.DOTALL)
+
+            return cls(
+                reasoning=reasoning,
+                step=retrieve_match.group(1).strip() if retrieve_match else None,
+                stop_search=stop_match.group(1).strip() if stop_match else None,
+                final_answer=answer_match.group(1).strip() if answer_match else None,
+            )
 
 
 class GravitationalCore:
@@ -201,12 +248,14 @@ class GravitationalCore:
         temperature: float = 0.0,
         max_tokens: int = 2048,
         confidence_threshold: float = 0.85,
+        use_xml: bool = True,
     ):
         self.llm_client = llm_client
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.confidence_threshold = confidence_threshold
+        self.use_xml = use_xml
         self.state: Optional[GravitationalState] = None
 
     def initialize(self, question: str, max_hops: int = 15, context_budget: int = 8192):
@@ -248,9 +297,12 @@ class GravitationalCore:
 
         state_prompt = self.state.build_prompt()
 
+        prompt = GRAVITATIONAL_CORE_PROMPT if self.use_xml else GRAVITATIONAL_CORE_PROMPT_PLAIN
+        action_hint = "step / stop_search / final_answer" if self.use_xml else "RETRIEVE / STOP / ANSWER"
+
         messages = [
-            {"role": "system", "content": GRAVITATIONAL_CORE_PROMPT},
-            {"role": "user", "content": f"Current VORTEX state:\n\n{state_prompt}\n\nEmit next action (step / stop_search / final_answer):"},
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": f"Current VORTEX state:\n\n{state_prompt}\n\nEmit next action ({action_hint}):"},
         ]
 
         response = self.llm_client.chat_completion(
@@ -261,7 +313,7 @@ class GravitationalCore:
         )
 
         content = response["choices"][0]["message"]["content"]
-        output = SpinOutput.parse(content)
+        output = SpinOutput.parse(content, use_xml=self.use_xml)
 
         if output.final_answer:
             pass

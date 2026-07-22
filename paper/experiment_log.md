@@ -103,3 +103,15 @@
 - **Total time:** 15.1 min
 - **Finding:** Equals same-model router (82%). llama3.1's more conservative fallback triggers VORTEX rescue more often (58% vs 38%).
 - **Key insight:** Fast-model uncertainty calibration matters more than raw accuracy.
+
+---
+
+### Run 15 (pending) — H1: DeepSeek-R1:7b + plain-English prompts (no XML)
+- **Date:** 2026-07-22
+- **Hardware:** T4 GPU (Colab)
+- **Configuration:** RUN_TYPE=vortex, MODEL=deepseek-r1:7b, USE_XML_PROMPTS=False
+- **Expected time:** ~50 min
+- **Hypothesis:** XML protocol is the primary failure mode for reasoning-optimized models.
+- **Prediction:** DeepSeek-R1 with plain-English prompts should score >65% (vs 57% with XML), closing the gap toward baseline (76%).
+- **If confirmed:** VORTEX can be made model-agnostic by detecting model family and adapting prompts.
+- **If refuted:** Reasoning traces fundamentally interfere with multi-hop retrieval.

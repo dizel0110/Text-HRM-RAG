@@ -96,7 +96,11 @@ def main():
     parser.add_argument("--corpus", default=None, help="JSON file with corpus chunks (optional)")
     parser.add_argument("--output", default="results", help="Output directory")
     parser.add_argument("--workers", type=int, default=1, help="Parallel workers (1 = sequential)")
+    parser.add_argument("--use-xml-prompts", action="store_true", default=True, help="Use XML prompts (default: True)")
+    parser.add_argument("--no-xml-prompts", action="store_true", help="Use plain-English prompts instead of XML")
     args = parser.parse_args()
+
+    use_xml = not args.no_xml_prompts
 
     cfg = VORTEXConfig.from_yaml(args.config)
     backend = backend_from_config(cfg.llm)
@@ -112,6 +116,7 @@ def main():
         temperature=cfg.llm.temperature,
         max_tokens=cfg.llm.max_tokens,
         confidence_threshold=cfg.engine.confidence_threshold,
+        use_xml=use_xml,
     )
 
     executor = CentrifugalIngestor(
@@ -121,6 +126,7 @@ def main():
         chunk_read=cr,
         model=cfg.llm.model,
         temperature=cfg.llm.temperature,
+        use_xml=use_xml,
     )
 
     engine = VortexEngine(
@@ -132,7 +138,7 @@ def main():
     questions, ground_truths = load_questions(args.questions)
     completed = load_checkpoint(args.output)
 
-    print(f"VORTEX Batch — mode={cfg.llm.mode}, model={cfg.llm.model}")
+    print(f"VORTEX Batch — mode={cfg.llm.mode}, model={cfg.llm.model}, use_xml={use_xml}")
     print(f"  Questions: {len(questions)} total, {len(completed)} already done")
     print(f"  Corpus: {len(chunks)} chunks")
     print(f"  Output: {args.output}\n")
