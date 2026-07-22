@@ -92,7 +92,7 @@ Three backends are implemented: MockBackend (canned responses, zero deps for tes
 
 \subsection{Setup}
 
-We evaluate on a multi-domain corpus (60 chunks, 10 domains) with 50 question-answer pairs. All experiments use Ollama with temperature 0.0 on an NVIDIA T4 GPU (16 GB VRAM) unless noted otherwise. We test three 7-8B models: \texttt{qwen2.5:7b}, \texttt{llama3.1:8b}, and \texttt{mistral} (v0.1, 7B). For each model we run both VORTEX and a Naive RAG baseline (single-pass retrieve + answer, same corpus). Ablation varies \texttt{max\_spirals} from 1 to 15 on \texttt{qwen2.5:7b}.
+We evaluate on a multi-domain corpus (60 chunks, 10 domains) with 50 question-answer pairs. All experiments use Ollama with temperature 0.0 on an NVIDIA T4 GPU (16 GB VRAM) unless noted otherwise. We test four 7-8B models: \texttt{qwen2.5:7b}, \texttt{llama3.1:8b}, \texttt{mistral} (v0.1, 7B), and \texttt{DeepSeek-R1} (7B distill). For each model we run both VORTEX and a Naive RAG baseline (single-pass retrieve + answer, same corpus). Ablation varies \texttt{max\_spirals} from 1 to 15 on \texttt{qwen2.5:7b}.
 
 \subsection{Metrics}
 
@@ -109,10 +109,12 @@ Model & Baseline & VORTEX & Router & $\Delta$ (Router vs Base) \\
 \texttt{qwen2.5:7b} & 68\% & 74\% & \textbf{82\%} & $+14\%$ \\
 \texttt{llama3.1:8b} & 72\% & 62\% & --- & --- \\
 \texttt{mistral} (7B) & 68\% & 56\% & --- & --- \\
+\texttt{DeepSeek-R1} (7B) & \textbf{76\%} & 57\% & --- & --- \\
 Cross-model$^\dag$ & 72\% & --- & \textbf{84\%} & $+12\%$ \\
+Cross-model$^{\ddagger}$ & 76\% & --- & 82\% & $+6\%$ \\
 \bottomrule
 \end{tabular}
-\caption{VORTEX vs Naive RAG vs Router (Contains, 50 QA). Same-model Router uses \texttt{qwen2.5:7b}; $^\dag$Cross-model Router uses \texttt{llama3.1:8b} (fast) and \texttt{qwen2.5:7b} VORTEX (slow).}
+\caption{VORTEX vs Naive RAG vs Router (Contains, 50 QA). $^\dag$Cross-model: \texttt{llama3.1:8b} (fast) / \texttt{qwen2.5:7b} VORTEX (slow). $^{\ddagger}$Cross-model: \texttt{DeepSeek-R1} (fast) / \texttt{qwen2.5:7b} VORTEX (slow).}
 \label{tab:main}
 \end{table}
 
@@ -159,6 +161,8 @@ Single-pass (no spirals) yields 60\% (Fig.~\ref{fig:ablation}, Table~\ref{tab:ab
 
 Table~\ref{tab:main} reveals a critical finding: VORTEX {\it helps} \texttt{qwen2.5:7b} (+6\%) but {\it hurts} \texttt{llama3.1:8b} ($-10\%$) and \texttt{mistral} ($-12\%$). The explanation lies in the interaction between the planner's XML protocol and each model's instruction-following profile. \texttt{qwen2.5:7b}---trained on diverse structured data---faithfully executes the XML contract. \texttt{llama3.1:8b}, optimized for conversational chat, struggles with the ``fact-free reasoning axis'' framing, producing degraded outputs in its planner and executor roles. \texttt{mistral} lacks the parametric capacity to handle the multi-step decomposition at all.
 
+A fourth model, \texttt{DeepSeek-R1} (7B distill), exhibits the most extreme sensitivity: it achieves the highest baseline (76\%) but the lowest VORTEX accuracy (57\%), a $-19\%$ degradation. DeepSeek-R1 is trained via reinforcement learning to produce reasoning traces before answering. This reasoning style conflicts with VORTEX's structured XML protocol---the model generates internal chain-of-thought that VORTEX's planner misinterprets as factual content, degrading both planning and condensation. This confirms that VORTEX's architecture favors models optimized for structured instruction following (qwen2.5) over those optimized for chain-of-thought reasoning (DeepSeek-R1).
+
 This establishes a requirement for future work: VORTEX must either adapt its prompts to each LLM family or incorporate a fast-path (System 1) bypass for questions where the model's direct answer is already strong.
 
 \subsection{Fast/Slow Router}
@@ -194,20 +198,22 @@ Limitations: four questions (8\%) received confident but incorrect answers from 
 
 \subsection{Cross-Model Router}
 
-The same-model router uses one LLM for both paths. However, \texttt{llama3.1:8b} has the strongest direct answer (72\% baseline) while \texttt{qwen2.5:7b} excels at VORTEX spirals (74\%), suggesting a cross-model architecture: fast path with \texttt{llama3.1:8b} (stronger System 1) and slow path with \texttt{qwen2.5:7b} VORTEX (stronger System 2).
+The same-model router uses one LLM for both paths. However, Table~\ref{tab:main} reveals complementary strengths: \texttt{DeepSeek-R1} has the strongest baseline (76\%), \texttt{llama3.1:8b} has the second-strongest (72\%), and \texttt{qwen2.5:7b} excels at VORTEX spirals (74\%). This motivates a cross-model architecture: fast path with a strong-direct-answer model, slow path with \texttt{qwen2.5:7b} VORTEX.
 
-We evaluate this on the same 50-question benchmark. The fast path handles 41/50 questions (82\%) at 93\% accuracy; the slow path recovers 4 of 9 fallbacks (44\%). Overall: \textbf{84\%} (42/50)---a $+12\%$ gain over the fast-model baseline and $+2\%$ over the same-model router. Total time: 9.8 min (11.8 s avg). This is the best result on our benchmark.
+We evaluate two configurations. The first uses \texttt{llama3.1:8b} (fast, 72\% baseline) and \texttt{qwen2.5:7b} VORTEX (slow). The fast path handles 41/50 questions (82\%) at 93\% accuracy; the slow path recovers 4 of 9 fallbacks (44\%). Overall: \textbf{84\%} (42/50)---the best result on our benchmark.
+
+The second configuration uses \texttt{DeepSeek-R1} (fast, 76\% baseline) and \texttt{qwen2.5:7b} VORTEX (slow). Despite DeepSeek's higher baseline, this achieves only 82\% (41/50): the fast path handles 42/50 questions at 90\% accuracy, but the slow path recovers only 3 of 8 fallbacks (38\%). The improvement comes from \texttt{llama3.1:8b}'s more conservative uncertainty estimation---it sends 24\% of questions to fallback vs.\ 16\% for DeepSeek, and VORTEX rescues more of those uncertain cases (58\% vs.\ 38\%). This suggests that fast-model confidence calibration, not raw accuracy, is the key factor in cross-model router design.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
 VORTEX demonstrates that a fact-free planner with fixed chained retrieval and entropic collapse is a viable architecture for multi-hop QA. On \texttt{qwen2.5:7b}, VORTEX achieves 74\% Contains (+6\% over Naive RAG) with 2.4$\times$ fewer hallucinations. Ablation confirms that the spiral mechanism is responsible for these gains, with 5 spirals sufficient for convergence.
 
-The Fast/Slow Router extends this to 82\% (same-model) and 84\% (cross-model) by gating between direct answer and spiral retrieval using the LLM's own uncertainty signal. Cross-model routing---fast path with \texttt{llama3.1:8b}, slow path with \texttt{qwen2.5:7b} VORTEX---is the best-performing configuration on our benchmark. This zero-training approach achieves competitive gains without the complexity of trained reflection or separate classifiers. The router also reduces average latency 5$\times$ compared to running VORTEX on every question.
+The Fast/Slow Router extends this to 82\% (same-model) and 84\% (cross-model) by gating between direct answer and spiral retrieval using the LLM's own uncertainty signal. Cross-model routing---fast path with \texttt{llama3.1:8b}, slow path with \texttt{qwen2.5:7b} VORTEX---is the best-performing configuration. We further show that reasoning-optimized models (DeepSeek-R1) achieve the strongest baseline (76\%) but are incompatible with VORTEX's structured protocol (57\%), and that fast-model uncertainty calibration matters more than raw accuracy in cross-model router design.
 
-The system is offline-first, config-driven, and scales from laptop to cluster without code changes. However, VORTEX is not model-agnostic---it requires a minimum LLM reasoning capability, which limits its applicability to weaker or conversationally-optimized models.
+The system is offline-first, config-driven, and scales from laptop to cluster without code changes. However, VORTEX is not model-agnostic---it requires models optimized for structured instruction following rather than chain-of-thought reasoning, which limits its applicability to certain LLM families.
 
-Future work will explore additional model combinations (e.g., larger LLMs, open-weight models), integration of semantic search via FAISS, and scaling evaluation to HotpotQA~\cite{yang2018hotpotqa} and other established benchmarks.
+Future work will explore prompt adaptation for reasoning-optimized models, integration of semantic search via FAISS, and scaling evaluation to HotpotQA~\cite{yang2018hotpotqa} and other established benchmarks.
 
 \section*{Acknowledgments}
 

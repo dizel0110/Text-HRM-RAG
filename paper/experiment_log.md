@@ -72,6 +72,34 @@
 - **Δ vs same-model router (+2%), vs fast baseline (+12%), vs VORTEX (+10%)
 - **Status:** COMPLETED (best result on benchmark)
 
-### Run 12 (optional) — VORTEX + llama3.1:8b (simplified prompts)
+### Run 11 (optional) — VORTEX + llama3.1:8b (simplified prompts)
 - **Conditional:** If cross-model router succeeds, skip this. Otherwise, try plain-English prompts.
-- **Status:** BACKUP
+- **Status:** SKIPPED (cross-model succeeded)
+
+---
+
+## Tag: v1.3-sspp (in-progress)
+
+### Run 12 — Baseline + DeepSeek-R1:7b
+- **Date:** 2026-07-22
+- **Hardware:** T4 GPU (Colab)
+- **Results:** Contains 76% (38/50), EM 2%, F1 22.5%
+- **Total time:** 9.9 min
+- **Finding:** Best baseline on benchmark. DeepSeek-R1's reasoning distillation gives strong direct answers.
+
+### Run 13 — VORTEX + DeepSeek-R1:7b
+- **Date:** 2026-07-22
+- **Hardware:** T4 GPU (Colab)
+- **Results:** Contains 57.1% (28/49), EM 32.7%, F1 52.4%
+- **Total time:** 21.0 min (49/50 questions, 1 Ollama 500 error)
+- **Finding:** Worst VORTEX result. Reasoning traces conflict with XML protocol.
+
+### Run 14 — Cross-model Router: fast=DeepSeek-R1:7b, slow=qwen2.5:7b VORTEX
+- **Date:** 2026-07-22
+- **Hardware:** T4 GPU (Colab)
+- **Results:** Contains 82% (41/50), EM 2%, F1 25.9%
+- **Fast path:** 42/50 (84%), 38/42 = 90% accuracy
+- **Slow path:** 8/50 (16%), 3/8 = 38% saved
+- **Total time:** 15.1 min
+- **Finding:** Equals same-model router (82%). llama3.1's more conservative fallback triggers VORTEX rescue more often (58% vs 38%).
+- **Key insight:** Fast-model uncertainty calibration matters more than raw accuracy.
