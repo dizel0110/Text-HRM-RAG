@@ -1,0 +1,17 @@
+{
+  "mode": "full",
+  "run_id": "2026-07-22_16-09-11",
+  "config": "colab-gpu.yaml",
+  "model": "deepseek-r1:7b",
+  "fast_model": "deepseek-r1:7b",
+  "slow_model": "qwen2.5:7b",
+  "num_questions": 50,
+  "questions": "/content/Text-HRM-RAG/vortex-hrm/data/multi_domain/questions.json",
+  "corpus": "data/multi_domain/corpus.json",
+  "engine": "FastSlowRouter",
+  "run_type": "router",
+  "ablation_spirals": null,
+  "colab_gpu": "T4",
+  "total_time_s": 907.6,
+  "total_time_min": 15.1
+}
